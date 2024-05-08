@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Staff-Client Assignment Management{% endblock %}
+
+{% block content %}
+
+<h1>Staff-Client Assignment Listing</h1>
+
+<table id="staffClientsTable">
+    <thead>
+        <tr>
+            <th>Staff ID</th>
+            <th>Staff Name</th>
+            <th>Client ID</th>
+            <th>Client Name</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for assignment in assignments %}
+        <tr>
+            <td>{{ assignment.staffID }}</td>
+            <td>{{ assignment.staffName }}</td>
+            <td>{{ assignment.clientID }}</td>
+            <td>{{ assignment.clientName }}</td>
+            <td>
+                <button onclick="deleteAssignment('{{ assignment.staffID }}', '{{ assignment.clientID }}')">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Assign Staff to Client</h2>
+<table>
+    <form method="POST" action="/search_staff_clients">
+        <thead>
+            <tr>
+                <th>Staff ID</th>
+                <th>Staff Name</th>
+                <th>Client ID</th>
+                <th>Client Name</th>
+                <th>Add</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td><input type="text" class="search-input" name="searchStaff" placeholder="Search Staff..."></td>
+                <td></td>
+                <td> <input type="text" class="search-input" name="searchClient" placeholder="Search Client...">
+                </td>
+                <td>
+                    <button type="submit">Add</button>
+                </td>
+            </tr>
+        </tbody>
+    </form>
+</table>
+
+{% endblock %}

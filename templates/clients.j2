@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Clients Management{% endblock %}
+
+{% block content %}
+
+<h1>Clients Listing</h1>
+
+<table id="clientsTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Sex</th>
+            <th>Age</th>
+            <th>Height</th>
+            <th>Weight</th>
+            <th>Activity Level</th>
+            <th>Calorie Target</th>
+            <th>Note</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.clientID }}</td>
+            <td>{{ client.clientName }}</td>
+            <td>{{ client.clientEmail }}</td>
+            <td>{{ client.clientSex }}</td>
+            <td>{{ client.clientAge }}</td>
+            <td>{{ client.clientHeight }}</td>
+            <td>{{ client.clientWeight }}</td>
+            <td>{{ client.clientActivityLevel }}</td>
+            <td>{{ client.clientCalorieTarget }}</td>
+            <td>{{ client.clientNote }}</td>
+            <td>
+                <button onclick="editClient({{ client.clientID }})">Edit</button>
+            </td>
+            <td>
+                <button onclick="deleteClient({{ client.clientID }})">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2 id="add-client">Add Client</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Sex</th>
+            <th>Age</th>
+            <th>Height</th>
+            <th>Weight</th>
+            <th>Activity Level</th>
+            <th>Calorie Target</th>
+            <th>Note</th>
+            <th>Add</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><input type="text" id="addClientName" name="clientName" required></td>
+            <td><input type="email" id="addClientEmail" name="clientEmail" required></td>
+            <td>
+                <select id="addClientSex" name="clientSex" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </td>
+            <td><input type="number" id="addClientAge" name="clientAge" required></td>
+            <td><input type="number" id="addClientHeight" name="clientHeight" step="0.1" required></td>
+            <td><input type="number" id="addClientWeight" name="clientWeight" step="0.1" required></td>
+            <td>
+                <select id="addClientActivityLevel" name="clientActivityLevel" required>
+                    <option value="Sedentary">Sedentary</option>
+                    <option value="Light">Light</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="High">High</option>
+                    <option value="Athlete">Athlete</option>
+                </select>
+            </td>
+            <td><input type="number" id="addClientCalorieTarget" name="clientCalorieTarget" required></td>
+            <td><input type="text" id="addClientNote" name="clientNote"></td>
+            <td><button type="submit">Add</button></td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}

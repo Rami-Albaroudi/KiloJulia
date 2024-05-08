@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Foods Management{% endblock %}
+
+{% block content %}
+
+<h1>Foods Listing</h1>
+
+<table id="foodsTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Calories Per Gram</th>
+            <th>Note</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for food in foods %}
+        <tr>
+            <td>{{ food.foodID }}</td>
+            <td>{{ food.foodName }}</td>
+            <td>{{ food.foodType }}</td>
+            <td>{{ food.foodCaloriesPerGram }}</td>
+            <td>{{ food.foodNote }}</td>
+            <td>
+                <button onclick="editFood({{ food.foodID }})">Edit</button>
+            </td>
+            <td>
+                <button onclick="deleteFood({{ food.foodID }})">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2 id="add-food">Add Food</h2>
+<form method="POST" action="/add_food">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Calories Per Gram</th>
+                <th>Note</th>
+                <th>Add</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" id="addFoodName" name="foodName" required></td>
+                <td>
+                    <select id="foodType" name="foodType" required>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Seafood">Seafood</option>
+                        <option value="Dairy">Dairy</option>
+                        <option value="Mushrooms">Mushrooms</option>
+                        <option value="Grains">Grains</option>
+                        <option value="Meat">Meat</option>
+                        <option value="Spices">Spices</option>
+                        <option value="Nuts">Nuts</option>
+                        <option value="Greens">Greens</option>
+                        <option value="Sweets">Sweets</option>
+                        <option value="Oils and Sauces">Oils and Sauces</option>
+                        <option value="Beverages">Beverages</option>
+                        <option value="Alcohol">Alcohol</option>
+                        <option value="Soups">Soups</option>
+                        <option value="Baked Products">Baked Products</option>
+                        <option value="Fast Foods">Fast Foods</option>
+                        <option value="Meals and Recipes">Meals and Recipes</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </td>
+                <td><input type="number" id="addFoodCaloriesPerGram" name="foodCaloriesPerGram" step="0.01" required>
+                </td>
+                <td><input type="text" id="addFoodNote" name="foodNote"></td>
+                <td><button type="submit">Add</button></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Tracked Days Management{% endblock %}
+
+{% block content %}
+<h1>Tracked Days Listing</h1>
+
+<!-- Tracked Days Table -->
+<table id="trackedDaysTable">
+    <thead>
+        <tr>
+            <th>Tracked Day ID</th>
+            <th>Client ID</th>
+            <th>Client Name</th>
+            <th>Date</th>
+            <th>Total Calories</th>
+            <th>Calorie Target</th>
+            <th>Note</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for day in tracked_days %}
+        <tr>
+            <td>{{ day.trackedDayID }}</td>
+            <td>{{ day.clientID }}</td>
+            <td>{{ day.clientName }}</td> <!-- Assuming clientName is passed along with each tracked day -->
+            <td>{{ day.trackedDayDate }}</td>
+            <td>{{ day.trackedDayTotalCalories }}</td>
+            <td>{{ day.trackedDayCalorieTarget }}</td>
+            <td>{{ day.trackedDayNote }}</td>
+            <td>
+                <button onclick="editTrackedDay({{ day.trackedDayID }})">Edit</button>
+            </td>
+            <td>
+                <button onclick="deleteTrackedDay({{ day.trackedDayID }})">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<h2 id="add-tracked-day">Add Tracked Day</h2>
+<form method="POST" action="/add_tracked_day">
+    <table>
+        <thead>
+            <tr>
+                <th>Client Name</th>
+                <th>Client ID</th>
+                <th>Date</th>
+                <th>Total Calories</th>
+                <th>Calorie Target</th>
+                <th>Note</th>
+                <th>Add</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input type="text" id="clientName" name="clientName" list="clientNames" autocomplete="off" required>
+                    <datalist id="clientNames">
+                        {% for client in clients %}
+                        <option data-client-id="{{ client.clientID }}"
+                            data-calorie-target="{{ client.clientCalorieTarget }}">
+                            {{ client.clientName }}
+                        </option>
+                        {% endfor %}
+                    </datalist>
+                </td>
+                <td><input type="text" id="clientID" name="clientID" readonly></td>
+                <td><input type="date" id="trackedDayDate" name="trackedDayDate" required></td>
+                <td><input type="number" id="trackedDayTotalCalories" name="trackedDayTotalCalories" required></td>
+                <td><input type="text" id="trackedDayCalorieTarget" name="trackedDayCalorieTarget" readonly></td>
+                <td><input type="text" id="trackedDayNote" name="trackedDayNote"></td>
+                <td><button type="submit">Add</button></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+<script>
+    document.getElementById('clientName').addEventListener('input', function (e) {
+        var option = document.querySelector('#clientNames option[value="' + e.target.value + '"]');
+        if (option) {
+            document.getElementById('clientID').value = option.getAttribute('data-client-id');
+            document.getElementById('trackedDayCalorieTarget').value = option.getAttribute('data-calorie-target');
+        }
+    });
+</script>
+{% endblock %}

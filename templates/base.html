@@ -1,0 +1,72 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}
+    <title>{% block title %}Default Title{% endblock %}</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        nav {
+            width: 100%;
+            background-color: #f1f1f1;
+            padding: 10px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+    </style>
+    {% endblock %}
+</head>
+
+<body>
+    {% block header %}
+    <!-- Global Navigation -->
+    <nav>
+        <h3>Pages</h3>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/staff">Staff</a></li>
+            <li><a href="/clients">Clients</a></li>
+            <li><a href="/staffclients">Staff-Client Assignments</a></li>
+            <li><a href="/foods">Foods</a></li>
+            <li><a href="/trackeddays">Tracked Days</a></li>
+            <li><a href="/foodentries">Food Entries</a></li>
+            <li><a href="/exerciseentries">Exercise Entries</a></li>
+        </ul>
+    </nav>
+    {% endblock %}
+
+    {% block content %}
+    <!-- content goes here -->
+    {% endblock %}
+
+    {% block footer %}
+    <footer>
+        <p>© Rami Albaroudi, Mohamed Saud, 2024</p>
+    </footer>
+    {% endblock %}
+</body>
+
+</html>
