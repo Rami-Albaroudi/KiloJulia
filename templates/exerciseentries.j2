@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Exercise Entries Management{% endblock %}
+
+{% block content %}
+<h1>Exercise Entries Listing</h1>
+
+<!-- Exercise Entries Table -->
+<table id="exerciseEntriesTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tracked Day ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Calories</th>
+            <th>Note</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exerciseentry in exerciseentries %}
+        <tr>
+            <td>{{ exerciseentry.exerciseEntryID }}</td>
+            <td>{{ exerciseentry.trackedDayID }}</td>
+            <td>{{ exerciseentry.exerciseEntryName }}</td>
+            <td>{{ exerciseentry.exerciseEntryType }}</td>
+            <td>{{ exerciseentry.exerciseEntryCalories }}</td>
+            <td>{{ exerciseentry.exerciseEntryNote }}</td>
+            <td>
+                <button onclick="editExerciseEntry({{ exerciseentry.exerciseEntryID }})">Edit</button>
+            </td>
+            <td>
+                <button onclick="deleteExerciseEntry({{ exerciseentry.exerciseEntryID }})">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Add New Exercise Entry</h2>
+<form method="POST" action="/add_exercise_entry">
+    <table>
+        <thead>
+            <tr>
+                <th>Tracked Day ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Calories</th>
+                <th>Note</th>
+                <th>Add</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" id="trackedDayID" name="trackedDayID" required></td>
+                <td><input type="text" id="name" name="name" required></td>
+                <td>
+                    <select id="type" name="type" required>
+                        <option value="Cardio">Cardio</option>
+                        <option value="Strength">Strength</option>
+                        <option value="Stretching">Stretching</option>
+                        <option value="Balance">Balance</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </td>
+                <td><input type="number" id="calories" name="calories" required></td>
+                <td><input type="text" id="note" name="note"></td>
+                <td><button type="submit">Add</button></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+{% endblock %}

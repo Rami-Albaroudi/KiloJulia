@@ -100,7 +100,7 @@ DROP TABLE IF EXISTS `FoodEntries` ;
 CREATE TABLE IF NOT EXISTS `FoodEntries` (
   `foodEntryID` INT NOT NULL AUTO_INCREMENT,
   `trackedDayID` INT NOT NULL,
-  `foodID` INT NOT NULL,
+  `foodID` INT,
   `foodEntryCalories` INT UNSIGNED NOT NULL DEFAULT 0,
   `foodEntryGramWeight` INT UNSIGNED NOT NULL DEFAULT 0,
   `foodEntryNote` VARCHAR(255) NULL DEFAULT NULL,
@@ -116,8 +116,9 @@ CREATE TABLE IF NOT EXISTS `FoodEntries` (
   CONSTRAINT `fk_entry_food`
     FOREIGN KEY (`foodID`)
     REFERENCES `Foods` (`foodID`)
-    -- Don't delete or update historical food entries when the food is deleted or updated.
-    ON DELETE NO ACTION  
+    -- Don't delete or update historical food entries when the food is deleted or updated. 
+    -- Just set FK to NULL if deleted. 
+    ON DELETE SET NULL  
     ON UPDATE NO ACTION);
 
 -- Create Table `ExerciseEntries`

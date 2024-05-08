@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Food Entries Management{% endblock %}
+
+{% block content %}
+<h1>Food Entries Listing</h1>
+
+<!-- Food Entries Table -->
+<table id="foodEntriesTable">
+    <thead>
+        <tr>
+            <th>Food Entry ID</th>
+            <th>Tracked Day ID</th>
+            <th>Food ID</th>
+            <th>Calories</th>
+            <th>Gram Weight</th>
+            <th>Note</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for foodentry in foodentries %}
+        <tr>
+            <td>{{ foodentry.foodEntryID }}</td>
+            <td>{{ foodentry.trackedDayID }}</td>
+            <td>{{ foodentry.foodID }}</td>
+            <td>{{ foodentry.foodEntryCalories }}</td>
+            <td>{{ foodentry.foodEntryGramWeight }}</td>
+            <td>{{ foodentry.foodEntryNote }}</td>
+            <td>
+                <button onclick="editFoodEntry({{ foodentry.foodEntryID }})">Edit</button>
+            </td>
+            <td>
+                <button onclick="deleteFoodEntry({{ foodentry.foodEntryID }})">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Add Food Entry</h2>
+<form method="POST" action="/add_food_entry">
+    <table>
+        <thead>
+            <tr>
+                <th>Tracked Day ID</th>
+                <th>Food ID</th>
+                <th>Calories</th>
+                <th>Gram Weight</th>
+                <th>Note</th>
+                <th>Add</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" id="trackedDayID" name="trackedDayID" required></td>
+                <td><input type="number" id="foodID" name="foodID" required></td>
+                <td><input type="number" id="calories" name="calories" required></td>
+                <td><input type="number" id="gramWeight" name="gramWeight" required></td>
+                <td><input type="text" id="note" name="note"></td>
+                <td colspan="5"><button type="submit">Add</button></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+{% endblock %}

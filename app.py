@@ -23,7 +23,7 @@ db_connection = db_con.connect_to_database()
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template("index.j2")
+    return render_template("index.html")
 
 @app.route('/staff', methods=['GET', 'POST'])
 def staff():
@@ -83,21 +83,20 @@ def foods():
     foods = cursor.fetchall() 
     return render_template("foods.j2", foods=foods)
 
-'''
+
 @app.route('/foodentries')
 def foodentries():
     query = "SELECT * FROM FoodEntries;"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    results = json.dumps(cursor.fetchall())
-    return results
+    cursor = db_con.execute_query(db_connection=db_connection, query=query)
+    foodentries = cursor.fetchall() 
+    return render_template("foodentries.j2", foodentries=foodentries)
 
 @app.route('/exerciseentries')
 def exerciseentries():
     query = "SELECT * FROM ExerciseEntries;"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    results = json.dumps(cursor.fetchall())
-    return results
-'''
+    cursor = db_con.execute_query(db_connection=db_connection, query=query)
+    exerciseentries = cursor.fetchall() 
+    return render_template("exerciseentries.j2", exerciseentries=exerciseentries)
 
 # Listener
 

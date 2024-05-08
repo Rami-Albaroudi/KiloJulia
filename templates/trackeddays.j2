@@ -79,14 +79,4 @@
         </tbody>
     </table>
 </form>
-
-<script>
-    document.getElementById('clientName').addEventListener('input', function (e) {
-        var option = document.querySelector('#clientNames option[value="' + e.target.value + '"]');
-        if (option) {
-            document.getElementById('clientID').value = option.getAttribute('data-client-id');
-            document.getElementById('trackedDayCalorieTarget').value = option.getAttribute('data-calorie-target');
-        }
-    });
-</script>
 {% endblock %}

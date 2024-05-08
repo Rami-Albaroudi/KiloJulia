@@ -29,7 +29,6 @@ def execute_query(db_connection = None, query = None, query_params = ()):
         return None
 
     print("Executing %s with %s" % (query, query_params));
-    # Create a cursor to execute query. Why? Because apparently they optimize execution by retaining a reference according to PEP0249
     cursor = db_connection.cursor(mariadb.cursors.DictCursor)
 
     '''
@@ -38,19 +37,6 @@ def execute_query(db_connection = None, query = None, query_params = ()):
     for q in query_params:
         params = params + (q)
     '''
-    #TODO: Sanitize the query before executing it!!!
     cursor.execute(query, query_params)
-    # this will actually commit any changes to the database. without this no
-    # changes will be committed!
     db_connection.commit();
     return cursor
-
-if __name__ == '__main__':
-    print("Executing a sample query on the database using the credentials from db_credentials.py")
-    db = connect_to_database()
-    query = "SELECT * from bsg_people;"
-    results = execute_query(db, query);
-    print("Printing results of %s" % query)
-
-    for r in results.fetchall():
-        print(r)
