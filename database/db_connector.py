@@ -13,10 +13,10 @@ def connect_to_database(host = host, user = user, passwd = passwd, db = db):
 
 def execute_query(db_connection = None, query = None, query_params = ()):
     if db_connection is None:
-        print("No connection to the database found! Have you called connect_to_database() first?")
+        print("No connection to the database found.")
         return None
     if query is None or len(query.strip()) == 0:
-        print("query is empty! Please pass a SQL query in query")
+        print("Please pass a SQL query in query")
         return None
 
     print("Executing %s with %s" % (query, query_params));
