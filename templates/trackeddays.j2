@@ -1,40 +1,46 @@
-{% extends "base.html" %}
+<!--
+Citation for the following code:
+Date: 09/05/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+-->
 
-{% block title %}Tracked Days Management{% endblock %}
+{% extends "template.j2" %}
+
+{% block title %}Tracked Days{% endblock %}
 
 {% block content %}
-<h1>Tracked Days Listing</h1>
+<h3>Tracked Days Listing</h3>
 
-<!-- Tracked Days Table -->
-<table id="trackedDaysTable">
+<table>
     <thead>
         <tr>
             <th>Tracked Day ID</th>
-            <th>Client ID</th>
-            <th>Client Name</th>
             <th>Date</th>
+            <th>Client Name</th>
             <th>Total Calories</th>
             <th>Calorie Target</th>
+            <th>Calorie Balance</th>
             <th>Note</th>
             <th>Edit</th>
             <th>Delete</th>
         </tr>
     </thead>
     <tbody>
-        {% for day in tracked_days %}
+        {% for trackedday in trackeddays %}
         <tr>
-            <td>{{ day.trackedDayID }}</td>
-            <td>{{ day.clientID }}</td>
-            <td>{{ day.clientName }}</td> <!-- Assuming clientName is passed along with each tracked day -->
-            <td>{{ day.trackedDayDate }}</td>
-            <td>{{ day.trackedDayTotalCalories }}</td>
-            <td>{{ day.trackedDayCalorieTarget }}</td>
-            <td>{{ day.trackedDayNote }}</td>
+            <td>{{ trackedday.trackedDayID }}</td>
+            <td>{{ trackedday.trackedDayDate }}</td>
+            <td>{{ trackedday.clientName }}</td>
+            <td>{{ trackedday.trackedDayTotalCalories }}</td>
+            <td>{{ trackedday.trackedDayCalorieTarget }}</td>
+            <td>{{ trackedday.trackedDayTotalCalories - trackedday.trackedDayCalorieTarget }}</td>
+            <td>{{ trackedday.trackedDayNote }}</td>
             <td>
-                <button onclick="editTrackedDay({{ day.trackedDayID }})">Edit</button>
+                <button onclick="editTrackedDay({{ trackedday.trackedDayID }})">Edit</button>
             </td>
             <td>
-                <button onclick="deleteTrackedDay({{ day.trackedDayID }})">Delete</button>
+                <button onclick="deleteTrackedDay({{ trackedday.trackedDayID }})">Delete</button>
             </td>
         </tr>
         {% endfor %}
@@ -42,15 +48,13 @@
 </table>
 
 
-<h2 id="add-tracked-day">Add Tracked Day</h2>
+<h3>Add Tracked Day</h3>
 <form method="POST" action="/add_tracked_day">
     <table>
         <thead>
             <tr>
-                <th>Client Name</th>
-                <th>Client ID</th>
                 <th>Date</th>
-                <th>Total Calories</th>
+                <th>Client Name</th>
                 <th>Calorie Target</th>
                 <th>Note</th>
                 <th>Add</th>
@@ -58,8 +62,9 @@
         </thead>
         <tbody>
             <tr>
+                <td><input type="date" id="trackedDayDate" name="trackedDayDate" required></td>
                 <td>
-                    <input type="text" id="clientName" name="clientName" list="clientNames" autocomplete="off" required>
+                    <input type="text" id="clientName" name="clientName" list="clientNames" autocomplete="on" required>
                     <datalist id="clientNames">
                         {% for client in clients %}
                         <option data-client-id="{{ client.clientID }}"
@@ -69,10 +74,7 @@
                         {% endfor %}
                     </datalist>
                 </td>
-                <td><input type="text" id="clientID" name="clientID" readonly></td>
-                <td><input type="date" id="trackedDayDate" name="trackedDayDate" required></td>
-                <td><input type="number" id="trackedDayTotalCalories" name="trackedDayTotalCalories" required></td>
-                <td><input type="text" id="trackedDayCalorieTarget" name="trackedDayCalorieTarget" readonly></td>
+                <td><input type="number" id="trackedDayCalorieTarget" name="trackedDayCalorieTarget"></td>
                 <td><input type="text" id="trackedDayNote" name="trackedDayNote"></td>
                 <td><button type="submit">Add</button></td>
             </tr>

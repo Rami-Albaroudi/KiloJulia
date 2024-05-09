@@ -1,12 +1,19 @@
-{% extends "base.html" %}
+<!--
+Citation for the following code:
+Date: 09/05/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+-->
 
-{% block title %}Staff Management{% endblock %}
+{% extends "template.j2" %}
+
+{% block title %}Staff{% endblock %}
 
 {% block content %}
 
-<h1>Staff Listing</h1>
+<h3>Staff Listing</h3>
 
-<table id="staffTable">
+<table>
     <thead>
         <tr>
             <th>ID</th>
@@ -19,25 +26,25 @@
         </tr>
     </thead>
     <tbody>
-        {% for person in staff %}
+        {% for staff in staff %}
         <tr>
-            <td>{{ person.staffID }}</td>
-            <td>{{ person.staffName }}</td>
-            <td>{{ person.staffEmail }}</td>
-            <td>{{ person.staffCapacity }}</td>
-            <td>{{ person.staffNote }}</td>
+            <td>{{ staff.staffID }}</td>
+            <td>{{ staff.staffName }}</td>
+            <td>{{ staff.staffEmail }}</td>
+            <td>{{ staff.staffCapacity }}</td>
+            <td>{{ staff.staffNote }}</td>
             <td>
-                <button onclick="editStaff({{ person.staffID }})">Edit</button>
+                <button onclick="editStaff({{ staff.staffID }})">Edit</button>
             </td>
             <td>
-                <button onclick="deleteStaff({{ person.staffID }})">Delete</button>
+                <button onclick="deleteStaff({{ staff.staffID }})">Delete</button>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<h2 id="add-staff">Add Staff</h2>
+<h3>Add Staff</h3>
 <table>
     <thead>
         <tr>

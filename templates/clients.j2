@@ -1,12 +1,19 @@
-{% extends "base.html" %}
+<!--
+Citation for the following code:
+Date: 09/05/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+-->
 
-{% block title %}Clients Management{% endblock %}
+{% extends "template.j2" %}
+
+{% block title %}Clients{% endblock %}
 
 {% block content %}
 
-<h1>Clients Listing</h1>
+<h3>Clients Listing</h3>
 
-<table id="clientsTable">
+<table>
     <thead>
         <tr>
             <th>ID</th>
@@ -14,8 +21,8 @@
             <th>Email</th>
             <th>Sex</th>
             <th>Age</th>
-            <th>Height</th>
-            <th>Weight</th>
+            <th>Height (cm)</th>
+            <th>Weight (kg)</th>
             <th>Activity Level</th>
             <th>Calorie Target</th>
             <th>Note</th>
@@ -47,7 +54,7 @@
     </tbody>
 </table>
 
-<h2 id="add-client">Add Client</h2>
+<h3>Add Client</h3>
 <table>
     <thead>
         <tr>
@@ -55,8 +62,8 @@
             <th>Email</th>
             <th>Sex</th>
             <th>Age</th>
-            <th>Height</th>
-            <th>Weight</th>
+            <th>Height (cm)</th>
+            <th>Weight (kg)</th>
             <th>Activity Level</th>
             <th>Calorie Target</th>
             <th>Note</th>

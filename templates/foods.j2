@@ -1,12 +1,19 @@
-{% extends "base.html" %}
+<!--
+Citation for the following code:
+Date: 09/05/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+-->
 
-{% block title %}Foods Management{% endblock %}
+{% extends "template.j2" %}
+
+{% block title %}Foods{% endblock %}
 
 {% block content %}
 
-<h1>Foods Listing</h1>
+<h3>Foods Listing</h3>
 
-<table id="foodsTable">
+<table>
     <thead>
         <tr>
             <th>ID</th>
@@ -37,7 +44,7 @@
     </tbody>
 </table>
 
-<h2 id="add-food">Add Food</h2>
+<h3>Add Food</h3>
 <form method="POST" action="/add_food">
     <table>
         <thead>

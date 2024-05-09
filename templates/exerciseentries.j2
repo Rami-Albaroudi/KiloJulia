@@ -1,17 +1,24 @@
-{% extends "base.html" %}
+<!--
+Citation for the following code:
+Date: 09/05/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+-->
 
-{% block title %}Exercise Entries Management{% endblock %}
+{% extends "template.j2" %}
+
+{% block title %}Exercise Entries{% endblock %}
 
 {% block content %}
-<h1>Exercise Entries Listing</h1>
+<h3>Exercise Entries Listing</h3>
 
-<!-- Exercise Entries Table -->
-<table id="exerciseEntriesTable">
+<table>
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Tracked Day ID</th>
-            <th>Name</th>
+            <th>Exercise Entry ID</th>
+            <th>Tracked Day Date</th>
+            <th>Client Name</th>
+            <th>Exercise Name</th>
             <th>Type</th>
             <th>Calories</th>
             <th>Note</th>
@@ -23,7 +30,8 @@
         {% for exerciseentry in exerciseentries %}
         <tr>
             <td>{{ exerciseentry.exerciseEntryID }}</td>
-            <td>{{ exerciseentry.trackedDayID }}</td>
+            <td>{{ exerciseentry.trackedDayDate }}</td>
+            <td>{{ exerciseentry.clientName }}</td>
             <td>{{ exerciseentry.exerciseEntryName }}</td>
             <td>{{ exerciseentry.exerciseEntryType }}</td>
             <td>{{ exerciseentry.exerciseEntryCalories }}</td>
@@ -39,13 +47,14 @@
     </tbody>
 </table>
 
-<h2>Add New Exercise Entry</h2>
+<h3>Add New Exercise Entry</h3>
 <form method="POST" action="/add_exercise_entry">
     <table>
         <thead>
             <tr>
-                <th>Tracked Day ID</th>
-                <th>Name</th>
+                <th>Tracked Day Date</th>
+                <th>Client Name</th>
+                <th>Exercise Name</th>
                 <th>Type</th>
                 <th>Calories</th>
                 <th>Note</th>
@@ -54,7 +63,8 @@
         </thead>
         <tbody>
             <tr>
-                <td><input type="number" id="trackedDayID" name="trackedDayID" required></td>
+                <td><input type="date" id="trackedDayDate" name="trackedDayDate" required></td>
+                <td><input type="text" id="name" name="name" required></td>
                 <td><input type="text" id="name" name="name" required></td>
                 <td>
                     <select id="type" name="type" required>

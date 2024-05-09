@@ -1,19 +1,26 @@
-{% extends "base.html" %}
+<!--
+Citation for the following code:
+Date: 09/05/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+-->
 
-{% block title %}Food Entries Management{% endblock %}
+{% extends "template.j2" %}
+
+{% block title %}Food Entries{% endblock %}
 
 {% block content %}
-<h1>Food Entries Listing</h1>
+<h3>Food Entries Listing</h3>
 
-<!-- Food Entries Table -->
-<table id="foodEntriesTable">
+<table>
     <thead>
         <tr>
             <th>Food Entry ID</th>
-            <th>Tracked Day ID</th>
-            <th>Food ID</th>
-            <th>Calories</th>
+            <th>Tracked Day Date</th>
+            <th>Client Name</th>
+            <th>Food Name</th>
             <th>Gram Weight</th>
+            <th>Calories</th>
             <th>Note</th>
             <th>Edit</th>
             <th>Delete</th>
@@ -23,10 +30,11 @@
         {% for foodentry in foodentries %}
         <tr>
             <td>{{ foodentry.foodEntryID }}</td>
-            <td>{{ foodentry.trackedDayID }}</td>
-            <td>{{ foodentry.foodID }}</td>
-            <td>{{ foodentry.foodEntryCalories }}</td>
+            <td>{{ foodentry.trackedDayDate }}</td>
+            <td>{{ foodentry.clientName }}</td>
+            <td>{{ foodentry.foodName }}</td>
             <td>{{ foodentry.foodEntryGramWeight }}</td>
+            <td>{{ foodentry.foodEntryCalories }}</td>
             <td>{{ foodentry.foodEntryNote }}</td>
             <td>
                 <button onclick="editFoodEntry({{ foodentry.foodEntryID }})">Edit</button>
@@ -39,25 +47,27 @@
     </tbody>
 </table>
 
-<h2>Add Food Entry</h2>
+<h3>Add Food Entry</h3>
 <form method="POST" action="/add_food_entry">
     <table>
         <thead>
             <tr>
-                <th>Tracked Day ID</th>
-                <th>Food ID</th>
-                <th>Calories</th>
+                <th>Tracked Day Date</th>
+                <th>Client Name</th>
+                <th>Food Name</th>
                 <th>Gram Weight</th>
+                <th>Calories</th>
                 <th>Note</th>
                 <th>Add</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><input type="number" id="trackedDayID" name="trackedDayID" required></td>
-                <td><input type="number" id="foodID" name="foodID" required></td>
-                <td><input type="number" id="calories" name="calories" required></td>
+                <td><input type="date" id="trackedDayDate" name="trackedDayDate" required></td>
+                <td><input type="text" id="clientName" name="clientName" required></td>
+                <td><input type="text" id="foodName" name="foodName" required></td>
                 <td><input type="number" id="gramWeight" name="gramWeight" required></td>
+                <td><input type="number" id="calories" name="calories" required></td>
                 <td><input type="text" id="note" name="note"></td>
                 <td colspan="5"><button type="submit">Add</button></td>
             </tr>
