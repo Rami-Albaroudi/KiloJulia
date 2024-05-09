@@ -1,0 +1,58 @@
+<!--
+Citation for the following code:
+Date: 09/05/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+Favicon sourced from: https://github.com/twitter/twemoji/blob/master/assets/svg/1f955.svg
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/favicon/site.webmanifest">
+    <title>{% block title %}Default Title{% endblock %}</title>
+    {% endblock %}
+</head>
+
+<body>
+    {% block header %}
+    <!-- Global Navigation -->
+    <nav>
+        <h1>KiloJulia
+            <img src="/static/favicon/favicon-32x32.png" alt="Logo" width="25" height="25">
+        </h1>
+        <ul>
+            <li><b><a href="/">Home</a></b></li>
+            <li><b><a href="/staff">Staff</a></b></li>
+            <li><b><a href="/clients">Clients</a></b></li>
+            <li><b><a href="/staffclients">Staff-Client Assignments</a></b></li>
+            <li><b><a href="/foods">Foods</a></b></li>
+            <li><b><a href="/trackeddays">Tracked Days</a></b></li>
+            <li><b><a href="/foodentries">Food Entries</a></b></li>
+            <li><b><a href="/exerciseentries">Exercise Entries</a></b></li>
+        </ul>
+    </nav>
+    {% endblock %}
+
+    {% block content %}
+    <!-- content goes here -->
+    {% endblock %}
+
+    {% block footer %}
+    <footer>
+        <b>
+            <p>© Rami Albaroudi, Mohamed Saud, 2024</p>
+        </b>
+    </footer>
+    {% endblock %}
+</body>
+
+</html>
