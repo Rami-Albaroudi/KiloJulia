@@ -8,19 +8,16 @@ Adapted from https://github.com/osu-cs340-ecampus/flask-starter-app with signifi
 from flask import Flask, render_template, request, redirect, json
 from flask_mysqldb import MySQL
 import os
-import database.db_credentials as db_creds
-import database.db_connector as db_con
+import database.db_connector as db
 
 # Configuration
 app = Flask(__name__)
-app.config['MYSQL_HOST'] = db_creds.host
-app.config['MYSQL_USER'] = db_creds.user
-app.config['MYSQL_PASSWORD'] = db_creds.passwd
-app.config['MYSQL_DB'] = db_creds.db
+app.config['MYSQL_HOST'] = db.host
+app.config['MYSQL_USER'] = db.user
+app.config['MYSQL_PASSWORD'] = db.passwd
+app.config['MYSQL_DB'] = db.db
 app.config['MYSQL_CURSORCLASS'] = "DictCursor"
-
 mysql = MySQL(app)
-db_connection = db_con.connect_to_database()
 
 # Routes 
 @app.route('/')
@@ -31,16 +28,18 @@ def index():
 @app.route('/staff', methods=['GET', 'POST'])
 def staff():
     query = "SELECT * FROM Staff;"
-    cursor = db_con.execute_query(db_connection=db_connection, query=query)
-    results = cursor.fetchall()
-    return render_template("staff.j2", staff=results)
+    cur = mysql.connection.cursor() 
+    cur.execute(query)
+    staff = cur.fetchall()
+    return render_template("staff.j2", staff=staff)
 
 @app.route('/clients')
 def clients():
     query = "SELECT * FROM Clients;"
-    cursor = db_con.execute_query(db_connection=db_connection, query=query)
-    results = cursor.fetchall()
-    return render_template("clients.j2", clients=results)
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    clients = cur.fetchall()
+    return render_template("clients.j2", clients=clients)
 
 @app.route('/staffclients')
 def staffclients():
@@ -50,30 +49,29 @@ def staffclients():
     JOIN Staff s ON sc.staffID = s.staffID
     JOIN Clients c ON sc.clientID = c.clientID;
     """
-    staffclients = db_con.execute_query(db_connection=db_connection, query=query).fetchall()
-    staff_query = "SELECT staffID, staffName FROM Staff;"
-    client_query = "SELECT clientID, clientName FROM Clients;"
-    staff = db_con.execute_query(db_connection=db_connection, query=staff_query).fetchall()
-    clients = db_con.execute_query(db_connection=db_connection, query=client_query).fetchall()
-    return render_template("staffclients.j2", staff=staff, clients=clients, staffclients=staffclients)
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    staffclients = cur.fetchall()
+    return render_template("staffclients.j2", staffclients=staffclients)
 
 @app.route('/trackeddays')
 def trackeddays():
-    trackeddays_query = """
+    query = """
     SELECT td.*, c.clientName
     FROM TrackedDays td
     JOIN Clients c ON td.clientID = c.clientID;
     """
-    clients_query = "SELECT clientID, clientName FROM Clients;"
-    trackeddays = db_con.execute_query(db_connection=db_connection, query=trackeddays_query).fetchall()
-    clients = db_con.execute_query(db_connection=db_connection, query=clients_query).fetchall()
-    return render_template("trackeddays.j2", trackeddays=trackeddays, clients=clients)
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    trackeddays = cur.fetchall()
+    return render_template("trackeddays.j2", trackeddays=trackeddays)
 
 @app.route('/foods')
 def foods():
     query = "SELECT * FROM Foods;"
-    cursor = db_con.execute_query(db_connection=db_connection, query=query)
-    foods = cursor.fetchall() 
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    foods = cur.fetchall()
     return render_template("foods.j2", foods=foods)
 
 @app.route('/foodentries')
@@ -96,8 +94,9 @@ def foodentries():
     JOIN 
         Clients ON TrackedDays.clientID = Clients.clientID;
     """
-    cursor = db_con.execute_query(db_connection=db_connection, query=query)
-    foodentries = cursor.fetchall()
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    foodentries = cur.fetchall()
     return render_template("foodentries.j2", foodentries=foodentries)
 
 @app.route('/exerciseentries')
@@ -118,11 +117,12 @@ def exerciseentries():
     JOIN 
         Clients ON TrackedDays.clientID = Clients.clientID;
     """
-    cursor = db_con.execute_query(db_connection=db_connection, query=query)
-    exerciseentries = cursor.fetchall()
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    exerciseentries = cur.fetchall()
     return render_template("exerciseentries.j2", exerciseentries=exerciseentries)
 
 # Listener
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 1867)) 
+    port = int(os.environ.get('PORT', 15834)) 
     app.run(port=port, debug=True)
