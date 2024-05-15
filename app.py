@@ -54,17 +54,67 @@ def staffclients():
     staffclients = cur.fetchall()
     return render_template("staffclients.j2", staffclients=staffclients)
 
-@app.route('/trackeddays')
+@app.route('/trackeddays', methods=['GET', 'POST'])
 def trackeddays():
-    query = """
-    SELECT td.*, c.clientName
-    FROM TrackedDays td
-    JOIN Clients c ON td.clientID = c.clientID;
-    """
-    cur = mysql.connection.cursor()
+    if request.method == 'POST':
+        search_query = request.form['search_query']
+        query = """
+        SELECT 
+            td.trackedDayID,
+            td.clientID,
+            td.trackedDayDate,
+            (
+                SELECT COALESCE(SUM(fe.foodEntryCalories), 0)
+                FROM FoodEntries fe
+                WHERE fe.trackedDayID = td.trackedDayID
+            ) -
+            (
+                SELECT COALESCE(SUM(ee.exerciseEntryCalories), 0)
+                FROM ExerciseEntries ee
+                WHERE ee.trackedDayID = td.trackedDayID
+            ) AS trackedDayTotalCalories,
+            td.trackedDayCalorieTarget,
+            td.trackedDayNote,
+            c.clientName
+        FROM TrackedDays td
+        JOIN Clients c ON td.clientID = c.clientID
+        WHERE c.clientName LIKE %s;
+        """
+        cur = mysql.connection.cursor()
+        cur.execute(query, ('%' + search_query + '%',))
+        trackeddays = cur.fetchall()
+    else:
+        query = """
+        SELECT 
+            td.trackedDayID,
+            td.clientID,
+            td.trackedDayDate,
+            (
+                SELECT COALESCE(SUM(fe.foodEntryCalories), 0)
+                FROM FoodEntries fe
+                WHERE fe.trackedDayID = td.trackedDayID
+            ) -
+            (
+                SELECT COALESCE(SUM(ee.exerciseEntryCalories), 0)
+                FROM ExerciseEntries ee
+                WHERE ee.trackedDayID = td.trackedDayID
+            ) AS trackedDayTotalCalories,
+            td.trackedDayCalorieTarget,
+            td.trackedDayNote,
+            c.clientName
+        FROM TrackedDays td
+        JOIN Clients c ON td.clientID = c.clientID;
+        """
+        cur = mysql.connection.cursor()
+        cur.execute(query)
+        trackeddays = cur.fetchall()
+
+    # Fetch all client names for autocomplete
+    query = "SELECT clientName FROM Clients;"
     cur.execute(query)
-    trackeddays = cur.fetchall()
-    return render_template("trackeddays.j2", trackeddays=trackeddays)
+    clients = cur.fetchall()
+
+    return render_template("trackeddays.j2", trackeddays=trackeddays, clients=clients)
 
 @app.route('/foods')
 def foods():

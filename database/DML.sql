@@ -1,19 +1,19 @@
 -- Citation for below queries:
--- Date: 09/05/2024
+-- Date: 09/05/2024 
 -- Authors: Rami Albaroudi, Mohamed Saud, Group 13
 -- The queries below are fully original work
 
 -- Query to get all staff members
 SELECT * FROM Staff;
 
--- Query to add a new staff member
+-- Query to add a new staff member  
 INSERT INTO Staff (staffName, staffEmail, staffCapacity, staffNote)
 VALUES ($staffNameInput, $staffEmailInput, $staffCapacityInput, $staffNoteInput);
 
 -- Query to update a staff member's details
-UPDATE Staff
-SET staffName = $staffNameInput, staffEmail = $staffEmailInput, 
-    staffCapacity = $staffCapacityInput, staffNote = $staffNoteInput
+UPDATE Staff 
+SET staffName = $staffNameInput, staffEmail = $staffEmailInput,
+    staffCapacity = $staffCapacityInput, staffNote = $staffNoteInput  
 WHERE staffID = $staffIDInput;
 
 -- Query to delete a staff member
@@ -25,105 +25,177 @@ SELECT * FROM Clients;
 -- Query to add a new client
 INSERT INTO Clients (clientName, clientEmail, clientSex, clientAge, clientHeight, 
                      clientWeight, clientActivityLevel, clientCalorieTarget, clientNote)
-VALUES ($clientNameInput, $clientEmailInput, $clientSexInput, $clientAgeInput, 
-        $clientHeightInput, $clientWeightInput, $clientActivityLevelInput, 
+VALUES ($clientNameInput, $clientEmailInput, $clientSexInput, $clientAgeInput,
+        $clientHeightInput, $clientWeightInput, $clientActivityLevelInput,
         $clientCalorieTargetInput, $clientNoteInput);
 
--- Query to update a client's details
+-- Query to update a client's details  
 UPDATE Clients
-SET clientName = $clientNameInput, clientEmail = $clientEmailInput, 
-    clientSex = $clientSexInput, clientAge = $clientAgeInput, 
+SET clientName = $clientNameInput, clientEmail = $clientEmailInput,
+    clientSex = $clientSexInput, clientAge = $clientAgeInput,
     clientHeight = $clientHeightInput, clientWeight = $clientWeightInput,
-    clientActivityLevel = $clientActivityLevelInput, 
+    clientActivityLevel = $clientActivityLevelInput,
     clientCalorieTarget = $clientCalorieTargetInput, clientNote = $clientNoteInput
 WHERE clientID = $clientIDInput;
 
 -- Query to delete a client
 DELETE FROM Clients WHERE clientID = $clientIDInput;
 
+-- Query to get staff-client assignments
+SELECT sc.staffID, s.staffName, sc.clientID, c.clientName
+FROM StaffClients sc 
+JOIN Staff s ON sc.staffID = s.staffID
+JOIN Clients c ON sc.clientID = c.clientID;
+
 -- Query to assign a client to a staff member
-INSERT INTO StaffClients (staffID, clientID) 
+INSERT INTO StaffClients (staffID, clientID)
 VALUES ($staffIDInput, $clientIDInput);
 
--- Query to remove a client from a staff member
-DELETE FROM StaffClients 
+-- Query to remove a client from a staff member  
+DELETE FROM StaffClients
 WHERE staffID = $staffIDInput AND clientID = $clientIDInput;
 
--- Query to get all tracked days for a client
-SELECT * FROM TrackedDays WHERE clientID = $clientIDInput;
+-- Query to get all tracked days with calorie totals and client names
+SELECT 
+    td.trackedDayID,
+    td.clientID, 
+    td.trackedDayDate,
+    (
+        SELECT COALESCE(SUM(fe.foodEntryCalories), 0)
+        FROM FoodEntries fe
+        WHERE fe.trackedDayID = td.trackedDayID  
+    ) -
+    (
+        SELECT COALESCE(SUM(ee.exerciseEntryCalories), 0)
+        FROM ExerciseEntries ee
+        WHERE ee.trackedDayID = td.trackedDayID
+    ) AS trackedDayTotalCalories,
+    td.trackedDayCalorieTarget,
+    td.trackedDayNote,
+    c.clientName
+FROM TrackedDays td
+JOIN Clients c ON td.clientID = c.clientID;
+
+-- Query to search tracked days by client name
+SELECT 
+    td.trackedDayID,
+    td.clientID,
+    td.trackedDayDate, 
+    (
+        SELECT COALESCE(SUM(fe.foodEntryCalories), 0)
+        FROM FoodEntries fe
+        WHERE fe.trackedDayID = td.trackedDayID
+    ) -  
+    (
+        SELECT COALESCE(SUM(ee.exerciseEntryCalories), 0) 
+        FROM ExerciseEntries ee
+        WHERE ee.trackedDayID = td.trackedDayID  
+    ) AS trackedDayTotalCalories,
+    td.trackedDayCalorieTarget, 
+    td.trackedDayNote,
+    c.clientName  
+FROM TrackedDays td
+JOIN Clients c ON td.clientID = c.clientID
+WHERE c.clientName LIKE %s;
 
 -- Query to add a new tracked day for a client
-INSERT INTO TrackedDays (clientID, trackedDayDate, trackedDayTotalCalories, 
-                         trackedDayCalorieTarget, trackedDayNote)
-VALUES ($clientIDInput, $trackedDayDateInput, $trackedDayTotalCaloriesInput, 
+INSERT INTO TrackedDays (clientID, trackedDayDate, trackedDayTotalCalories,
+                         trackedDayCalorieTarget, trackedDayNote) 
+VALUES ($clientIDInput, $trackedDayDateInput, $trackedDayTotalCaloriesInput,
         $trackedDayCalorieTargetInput, $trackedDayNoteInput);
 
 -- Query to update a tracked day's details
-UPDATE TrackedDays
-SET trackedDayDate = $trackedDayDateInput, 
-    trackedDayTotalCalories = $trackedDayTotalCaloriesInput,
-    trackedDayCalorieTarget = $trackedDayCalorieTargetInput, 
+UPDATE TrackedDays  
+SET trackedDayDate = $trackedDayDateInput,
+    trackedDayTotalCalories = $trackedDayTotalCaloriesInput, 
+    trackedDayCalorieTarget = $trackedDayCalorieTargetInput,
     trackedDayNote = $trackedDayNoteInput
 WHERE trackedDayID = $trackedDayIDInput AND clientID = $clientIDInput;
 
--- Query to delete a tracked day
-DELETE FROM TrackedDays 
+-- Query to delete a tracked day 
+DELETE FROM TrackedDays
 WHERE trackedDayID = $trackedDayIDInput AND clientID = $clientIDInput;
 
 -- Query to get all foods
 SELECT * FROM Foods;
 
 -- Query to add a new food
-INSERT INTO Foods (foodName, foodType, foodCaloriesPerGram, foodNote)
+INSERT INTO Foods (foodName, foodType, foodCaloriesPerGram, foodNote) 
 VALUES ($foodNameInput, $foodTypeInput, $foodCaloriesPerGramInput, $foodNoteInput);
 
 -- Query to update a food's details
 UPDATE Foods
-SET foodName = $foodNameInput, foodType = $foodTypeInput, 
+SET foodName = $foodNameInput, foodType = $foodTypeInput,  
     foodCaloriesPerGram = $foodCaloriesPerGramInput, foodNote = $foodNoteInput
 WHERE foodID = $foodIDInput;
 
 -- Query to delete a food
 DELETE FROM Foods WHERE foodID = $foodIDInput;
 
--- Query to get all food entries for a tracked day
-SELECT * FROM FoodEntries 
-WHERE trackedDayID = $trackedDayIDInput;
+-- Query to get all food entries with tracked day, client, and food details  
+SELECT
+    FoodEntries.foodEntryID,
+    TrackedDays.trackedDayDate,
+    Clients.clientName,
+    Foods.foodName,  
+    FoodEntries.foodEntryCalories,
+    FoodEntries.foodEntryGramWeight,
+    FoodEntries.foodEntryNote  
+FROM
+    FoodEntries 
+JOIN
+    Foods ON FoodEntries.foodID = Foods.foodID
+JOIN  
+    TrackedDays ON FoodEntries.trackedDayID = TrackedDays.trackedDayID
+JOIN
+    Clients ON TrackedDays.clientID = Clients.clientID;
 
 -- Query to add a new food entry for a tracked day
-INSERT INTO FoodEntries (trackedDayID, foodID, foodEntryCalories, 
+INSERT INTO FoodEntries (trackedDayID, foodID, foodEntryCalories,
                          foodEntryGramWeight, foodEntryNote)
-VALUES ($trackedDayIDInput, $foodIDInput, $foodEntryCaloriesInput, 
+VALUES ($trackedDayIDInput, $foodIDInput, $foodEntryCaloriesInput,  
         $foodEntryGramWeightInput, $foodEntryNoteInput);
 
--- Query to update a food entry's details
+-- Query to update a food entry's details  
 UPDATE FoodEntries
-SET foodID = $foodIDInput, foodEntryCalories = $foodEntryCaloriesInput, 
-    foodEntryGramWeight = $foodEntryGramWeightInput, foodEntryNote = $foodEntryNoteInput
+SET foodID = $foodIDInput, foodEntryCalories = $foodEntryCaloriesInput,
+    foodEntryGramWeight = $foodEntryGramWeightInput, foodEntryNote = $foodEntryNoteInput  
 WHERE foodEntryID = $foodEntryIDInput AND trackedDayID = $trackedDayIDInput;
 
 -- Query to delete a food entry
-DELETE FROM FoodEntries
+DELETE FROM FoodEntries  
 WHERE foodEntryID = $foodEntryIDInput AND trackedDayID = $trackedDayIDInput;
 
--- Query to get all exercise entries for a tracked day
-SELECT * FROM ExerciseEntries
-WHERE trackedDayID = $trackedDayIDInput;
+-- Query to get all exercise entries with tracked day and client details
+SELECT  
+    ExerciseEntries.exerciseEntryID,
+    TrackedDays.trackedDayDate,
+    Clients.clientName,
+    ExerciseEntries.exerciseEntryName,
+    ExerciseEntries.exerciseEntryType,  
+    ExerciseEntries.exerciseEntryCalories,
+    ExerciseEntries.exerciseEntryNote
+FROM
+    ExerciseEntries  
+JOIN
+    TrackedDays ON ExerciseEntries.trackedDayID = TrackedDays.trackedDayID  
+JOIN
+    Clients ON TrackedDays.clientID = Clients.clientID;
 
--- Query to add a new exercise entry for a tracked day
-INSERT INTO ExerciseEntries (trackedDayID, exerciseEntryName, exerciseEntryType, 
-                             exerciseEntryCalories, exerciseEntryNote)
-VALUES ($trackedDayIDInput, $exerciseEntryNameInput, $exerciseEntryTypeInput, 
+-- Query to add a new exercise entry for a tracked day  
+INSERT INTO ExerciseEntries (trackedDayID, exerciseEntryName, exerciseEntryType,
+                             exerciseEntryCalories, exerciseEntryNote) 
+VALUES ($trackedDayIDInput, $exerciseEntryNameInput, $exerciseEntryTypeInput,
         $exerciseEntryCaloriesInput, $exerciseEntryNoteInput);
 
 -- Query to update an exercise entry's details
 UPDATE ExerciseEntries
-SET exerciseEntryName = $exerciseEntryNameInput, 
+SET exerciseEntryName = $exerciseEntryNameInput,  
     exerciseEntryType = $exerciseEntryTypeInput,
-    exerciseEntryCalories = $exerciseEntryCaloriesInput, 
-    exerciseEntryNote = $exerciseEntryNoteInput
+    exerciseEntryCalories = $exerciseEntryCaloriesInput,
+    exerciseEntryNote = $exerciseEntryNoteInput  
 WHERE exerciseEntryID = $exerciseEntryIDInput AND trackedDayID = $trackedDayIDInput;
 
 -- Query to delete an exercise entry
-DELETE FROM ExerciseEntries
+DELETE FROM ExerciseEntries  
 WHERE exerciseEntryID = $exerciseEntryIDInput AND trackedDayID = $trackedDayIDInput;

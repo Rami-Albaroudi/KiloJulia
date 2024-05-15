@@ -69,7 +69,6 @@ CREATE TABLE IF NOT EXISTS `TrackedDays` (
   `trackedDayID` INT NOT NULL AUTO_INCREMENT,
   `clientID` INT NOT NULL,
   `trackedDayDate` DATE NOT NULL DEFAULT CURRENT_DATE,
-  `trackedDayTotalCalories` INT NOT NULL DEFAULT 0,
   `trackedDayCalorieTarget` INT NOT NULL DEFAULT 0,
   `trackedDayNote` VARCHAR(255) NULL DEFAULT NULL,
   PRIMARY KEY (`trackedDayID`, `clientID`),
@@ -163,11 +162,11 @@ INSERT INTO StaffClients (clientID, staffID) VALUES
 (4, 4);
 
 -- Insert TrackedDays
-INSERT INTO TrackedDays (trackedDayID, clientID, trackedDayDate, trackedDayTotalCalories, trackedDayCalorieTarget, trackedDayNote) VALUES
-(1, 1, '2024-04-20', 1364, 2900, 'Client''s first day'),
-(2, 2, '2024-04-20', 1407, 1700, NULL),
-(3, 1, '2024-04-21', 3500, 2900, 'Bulking season'),
-(4, 2, '2024-04-21', 1350, 1700, 'Not Reported');
+INSERT INTO TrackedDays (trackedDayID, clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote) VALUES
+(1, 1, '2024-04-20', 2900, 'Client''s first day'),
+(2, 2, '2024-04-20', 1700, NULL),
+(3, 1, '2024-04-21', 2900, 'Bulking season'),
+(4, 2, '2024-04-21', 1700, 'Not Reported');
 
 -- Insert Foods
 INSERT INTO Foods (foodID, foodName, foodType, foodCaloriesPerGram, foodNote) VALUES

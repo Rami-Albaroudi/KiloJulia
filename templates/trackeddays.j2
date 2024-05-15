@@ -15,6 +15,25 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 <table>
     <thead>
         <tr>
+            <th>Filter Days by Client &nbsp;
+                <form style="display: inline-block;" method="POST" action="{{ url_for('trackeddays') }}">
+                    <input type="text" name="search_query" id="search_query" list="clientNames"
+                        placeholder="Search by client name...">
+                    <datalist id="clientNames">
+                        {% for client in clients %}
+                        <option value="{{ client.clientName }}">
+                            {% endfor %}
+                    </datalist>
+                    <button type="submit">Search</button>
+                </form>
+            </th>
+        </tr>
+    </thead>
+</table>
+
+<table>
+    <thead>
+        <tr>
             <th>Tracked Day ID</th>
             <th>Date</th>
             <th>Client Name</th>
