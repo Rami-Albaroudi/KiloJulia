@@ -137,7 +137,7 @@ def foodentries():
         FoodEntries.foodEntryNote
     FROM 
         FoodEntries
-    JOIN 
+    LEFT JOIN 
         Foods ON FoodEntries.foodID = Foods.foodID
     JOIN 
         TrackedDays ON FoodEntries.trackedDayID = TrackedDays.trackedDayID

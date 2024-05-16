@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `TrackedDays` (
   `trackedDayDate` DATE NOT NULL DEFAULT CURRENT_DATE,
   `trackedDayCalorieTarget` INT NOT NULL DEFAULT 0,
   `trackedDayNote` VARCHAR(255) NULL DEFAULT NULL,
-  PRIMARY KEY (`trackedDayID`, `clientID`),
+  PRIMARY KEY (`trackedDayID`),
   UNIQUE INDEX `dayID_UNIQUE` (`trackedDayID` ASC) VISIBLE,
   INDEX `fk_TrackedDays_Clients1_idx` (`clientID` ASC) VISIBLE,
   CONSTRAINT `fk_TrackedDays_Clients1`
@@ -99,13 +99,12 @@ DROP TABLE IF EXISTS `FoodEntries` ;
 CREATE TABLE IF NOT EXISTS `FoodEntries` (
   `foodEntryID` INT NOT NULL AUTO_INCREMENT,
   `trackedDayID` INT NOT NULL,
-  `foodID` INT NOT NULL,
+  `foodID` INT,
   `foodEntryCalories` INT UNSIGNED NOT NULL DEFAULT 0,
   `foodEntryGramWeight` INT UNSIGNED NOT NULL DEFAULT 0,
   `foodEntryNote` VARCHAR(255) NULL DEFAULT NULL,
-  PRIMARY KEY (`foodEntryID`, `trackedDayID`, `foodID`),
+  PRIMARY KEY (`foodEntryID`),
   INDEX `idx_entry_day` (`trackedDayID` ASC) VISIBLE,
-  INDEX `idx_entry_food` (`foodID` ASC) VISIBLE,
   UNIQUE INDEX `entryID_UNIQUE` (`foodEntryID` ASC) VISIBLE,
   CONSTRAINT `fk_entry_day`
     FOREIGN KEY (`trackedDayID`)
@@ -115,9 +114,9 @@ CREATE TABLE IF NOT EXISTS `FoodEntries` (
   CONSTRAINT `fk_entry_food`
     FOREIGN KEY (`foodID`)
     REFERENCES `Foods` (`foodID`)
-    -- Don't delete or update historical food entries when the food is deleted or updated. 
-    ON DELETE NO ACTION  
-    ON UPDATE NO ACTION);
+    -- If food is deleted, keep the food entry, but set food ID to null. If food is updated, update the food entry. 
+    ON DELETE SET NULL  
+    ON UPDATE CASCADE);
 
 -- Create Table `ExerciseEntries`
 DROP TABLE IF EXISTS `ExerciseEntries` ;
@@ -128,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `ExerciseEntries` (
   `exerciseEntryType` ENUM('Cardio', 'Strength', 'Stretching', 'Balance', 'Other') NOT NULL,
   `exerciseEntryCalories` INT UNSIGNED NOT NULL DEFAULT 0,
   `exerciseEntryNote` VARCHAR(255) NULL DEFAULT NULL,
-  PRIMARY KEY (`exerciseEntryID`, `trackedDayID`),
+  PRIMARY KEY (`exerciseEntryID`),
   UNIQUE INDEX `exerciseID_UNIQUE` (`exerciseEntryID` ASC) VISIBLE,
   INDEX `fk_Exercises_Days1_idx` (`trackedDayID` ASC) VISIBLE,
   CONSTRAINT `fk_Exercises_Days1`
@@ -181,7 +180,8 @@ INSERT INTO FoodEntries (foodEntryID, trackedDayID, foodID, foodEntryCalories, f
 (2, 1, 2, 230, 100, NULL),
 (3, 1, 4, 1695, 500, 'Wendy''s Burger'),
 (4, 2, 2, 690, 300, 'Store-Bought'),
-(5, 2, 4, 1017, 300, 'Small Burger');
+(5, 2, 4, 1017, 300, 'Small Burger'),
+(6, 3, NULL, 250, 86, 'Calories from Chocolate Wrapper');
 
 -- Insert ExerciseEntries
 INSERT INTO ExerciseEntries (exerciseEntryID, trackedDayID, exerciseEntryName, exerciseEntryType, exerciseEntryCalories, exerciseEntryNote) VALUES
