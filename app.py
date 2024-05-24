@@ -11,7 +11,7 @@ from MySQLdb import IntegrityError
 import os
 import database.db_connector as db
 
-# Configuration
+# Configure connection to the database
 app = Flask(__name__)
 app.config['MYSQL_HOST'] = db.host
 app.config['MYSQL_USER'] = db.user
@@ -21,9 +21,11 @@ app.config['MYSQL_CURSORCLASS'] = "DictCursor"
 mysql = MySQL(app)
 
 ''' -------- Routes for Home -------- '''
+# We want / and /index to lead to the same place.
 @app.route('/')
 @app.route('/index')
 def index():
+    # We use Jinja/Flask templates to build the foundation for our pages
     return render_template("index.j2")
 
 ''' -------- Routes for Staff -------- '''
@@ -35,11 +37,14 @@ def staff():
         staffEmail = request.form['staffEmail']
         staffCapacity = request.form['staffCapacity']
         staffNote = request.form['staffNote']
+        # We check for errors by calling the validateStaffForm helper function to make sure the data is okay before we pass it to the DB
         errors = validateStaffForm(staffName, staffEmail)
         if not errors:
+            # This is the Python equivalent of try/catch in JS
             try:
                 insertStaff(staffName, staffEmail, staffCapacity, staffNote)
                 return redirect('/staff')
+            # We use the integrity error module in order to raise an error if a user's query would crash the database. 
             except IntegrityError:
                 return 'A staff member with this email already exists.', 400
         return render_template("staff.j2", staff=fetchStaff(), errors=errors)
@@ -88,10 +93,13 @@ def fetchStaff():
 def insertStaff(staffName, staffEmail, staffCapacity, staffNote):
     cur = mysql.connection.cursor()
     try:
+        # Our query placeholders are slightly different from the DML file due to Python/Flask requirements. This also helps prevent SQL injection
         cur.execute("INSERT INTO Staff (staffName, staffEmail, staffCapacity, staffNote) VALUES (%s, %s, %s, %s);",
                     (staffName, staffEmail, staffCapacity, staffNote))
+        # This is how we send the data to the DB
         mysql.connection.commit()
     except IntegrityError as e:
+        # We use this to roll back the change if there was an error with the query
         mysql.connection.rollback()
         raise e
 
@@ -109,10 +117,12 @@ def updateStaffRecord(staffID, staffName, staffEmail, staffCapacity, staffNote):
 # Helper function to DELETE a Staff record
 def deleteStaffRecord(staffID):
     cur = mysql.connection.cursor()
+    # We don't need validation here because DELETE is pretty simple
     cur.execute("DELETE FROM Staff WHERE staffID = %s;", (staffID,))
     mysql.connection.commit()
 
 ''' -------- Routes for Clients -------- '''
+# TODO: Implement CUD
 @app.route('/clients')
 def clients():
     query = "SELECT * FROM Clients;"
@@ -122,6 +132,7 @@ def clients():
     return render_template("clients.j2", clients=clients)
 
 ''' -------- Routes for Staff-Client Assignments -------- '''
+# TODO: Implement CUD
 @app.route('/staffclients')
 def staffclients():
     query = """
@@ -136,6 +147,7 @@ def staffclients():
     return render_template("staffclients.j2", staffclients=staffclients)
 
 ''' -------- Routes for Tracked Days -------- '''
+# TODO: Implement CUD
 @app.route('/trackeddays', methods=['GET', 'POST'])
 def trackeddays():
     if request.method == 'POST':
@@ -191,7 +203,7 @@ def trackeddays():
         cur.execute(query)
         trackeddays = cur.fetchall()
 
-    # Fetch all client names for autocomplete
+    # Get all client names for autocomplete
     query = "SELECT clientName FROM Clients;"
     cur.execute(query)
     clients = cur.fetchall()
@@ -199,6 +211,7 @@ def trackeddays():
     return render_template("trackeddays.j2", trackeddays=trackeddays, clients=clients)
 
 ''' -------- Routes for Foods -------- '''
+# TODO: Implement CUD
 @app.route('/foods')
 def foods():
     query = "SELECT * FROM Foods;"
@@ -208,6 +221,7 @@ def foods():
     return render_template("foods.j2", foods=foods)
 
 ''' -------- Routes for Food Entries -------- '''
+# TODO: Implement CUD
 @app.route('/foodentries')
 def foodentries():
     query = """
@@ -234,6 +248,7 @@ def foodentries():
     return render_template("foodentries.j2", foodentries=foodentries)
 
 ''' -------- Routes for Exercise Entries -------- '''
+# TODO: Implement CUD
 @app.route('/exerciseentries')
 def exerciseentries():
     query = """
