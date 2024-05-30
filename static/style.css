@@ -1,6 +1,6 @@
 /* 
 Citation for the following code:
-Date: 09/05/2024
+Date: 29/05/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
 Original work
 */
@@ -13,11 +13,12 @@ Original work
 
 body {
     font-family: 'Arial', sans-serif;
-    background-color: var(--background-colour); 
-    color: black; 
+    background-color: var(--background-colour);
+    color: black;
 }
 
-h2, h3 {
+h2,
+h3 {
     text-align: center;
 }
 
@@ -25,38 +26,43 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
-    overflow: hidden; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
 }
 
-th, td {
-    border-bottom: 1px solid lightgrey; 
+th,
+td {
+    border-bottom: 1px solid lightgrey;
     padding: 8px;
     text-align: left;
-    background-color: var(--table-colour); 
+    background-color: var(--table-colour);
+    box-sizing: border-box;
 }
 
 th {
-    background-color: var(--main-colour); 
-    color: black; 
+    background-color: var(--main-colour);
+    color: black;
     text-align: left;
 }
 
 nav {
     width: 100%;
-    background-color: var(--main-colour); 
+    background-color: var(--main-colour);
     text-align: center;
     padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
 }
 
 footer {
+    box-sizing: border-box;
     width: 100%;
-    background-color: var(--main-colour); 
+    background-color: var(--main-colour);
     text-align: center;
     padding: 3px;
     margin-top: 2%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 nav ul {
@@ -71,17 +77,23 @@ nav ul li {
 }
 
 .logo {
-    width: 40px; 
+    width: 40px;
     height: auto;
     vertical-align: middle;
 }
 
 a {
     text-decoration: none;
-    color: black; 
+    color: black;
     transition: color 0.3s ease;
 }
 
 a:hover {
-    color: #4580ff; 
+    color: #4580ff;
+}
+
+input,
+select {
+    box-sizing: border-box;
+    width: 100%
 }
