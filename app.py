@@ -6,12 +6,12 @@ Adapted from https://github.com/osu-cs340-ecampus/flask-starter-app with signifi
 """
 
 # Imports
-from flask import Flask, render_template, request, redirect, json
+from flask import Flask, render_template, request, redirect, jsonify
 from flask_mysqldb import MySQL
 from MySQLdb import IntegrityError
 import os
 import database.db_connector as db
-import re
+from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
 
 # Configure connection to the database
@@ -722,5 +722,5 @@ def exerciseentries():
 
 # Listener
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 15834))
+    port = int(os.environ.get("PORT", 15844))
     app.run(port=port, debug=True)
