@@ -11,7 +11,8 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 
 {% block content %}
 <h3>Exercise Entries Listing</h3>
-
+<h4 style="text-align: center;"><i><b>Instructions:</b> You cannot modify an exercise entry's associated client or
+        tracked day directly. Please delete and re-create the entry if those fields are incorrect.</i></h4>
 <table>
     <thead>
         <tr>
@@ -48,6 +49,8 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 </table>
 
 <h3>Add New Exercise Entry</h3>
+<h4 style="text-align: center;"><i><b>Instructions:</b> You must first create the tracked day entry before attempting
+        to add an exercise entry to that tracked day's log.</i></h4>
 <form method="POST" action="{{ url_for('exerciseentries') }}" onsubmit="return addExerciseEntry(event)">
     <table>
         <thead>
@@ -64,7 +67,15 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         <tbody>
             <tr>
                 <td><input type="date" id="trackedDayDate" name="trackedDayDate" required></td>
-                <td><input type="text" id="clientName" name="clientName" required></td>
+                <td>
+                    <input type="text" id="searchClient" name="clientName" list="clientNames"
+                        placeholder="Search Clients..." required>
+                    <datalist id="clientNames">
+                        {% for client in clients %}
+                        <option value="{{ client.clientName }}">
+                            {% endfor %}
+                    </datalist>
+                </td>
                 <td><input type="text" id="exerciseName" name="exerciseName" required></td>
                 <td>
                     <select id="type" name="type" required>
@@ -83,37 +94,35 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     </table>
 </form>
 
+
+
 <script>
     function editExerciseEntry(exerciseEntryID) {
         const row = document.getElementById('exerciseentry-' + exerciseEntryID);
         const [_, trackedDayDateCell, clientNameCell, exerciseNameCell, exerciseTypeCell, caloriesCell, noteCell, actionCell] = row.cells;
 
         // Store the original values in case the edit is cancelled
-        row.dataset.originalTrackedDayDate = trackedDayDateCell.innerText;
-        row.dataset.originalClientName = clientNameCell.innerText;
         row.dataset.originalExerciseName = exerciseNameCell.innerText;
         row.dataset.originalExerciseType = exerciseTypeCell.innerText;
         row.dataset.originalCalories = caloriesCell.innerText;
         row.dataset.originalNote = noteCell.innerText;
 
-        trackedDayDateCell.innerHTML = `<input type="date" value="${trackedDayDateCell.innerText}" readonly>`;
-        clientNameCell.innerHTML = `<input type="text" value="${clientNameCell.innerText}" readonly>`;
         exerciseNameCell.innerHTML = `<input type="text" value="${exerciseNameCell.innerText}" required>`;
         exerciseTypeCell.innerHTML = `
-        <select required>
-            <option value="Cardio">Cardio</option>
-            <option value="Strength">Strength</option>
-            <option value="Stretching">Stretching</option>
-            <option value="Balance">Balance</option>
-            <option value="Other">Other</option>
-        </select>
-    `;
+            <select required>
+                <option value="Cardio" ${exerciseTypeCell.innerText === 'Cardio' ? 'selected' : ''}>Cardio</option>
+                <option value="Strength" ${exerciseTypeCell.innerText === 'Strength' ? 'selected' : ''}>Strength</option>
+                <option value="Stretching" ${exerciseTypeCell.innerText === 'Stretching' ? 'selected' : ''}>Stretching</option>
+                <option value="Balance" ${exerciseTypeCell.innerText === 'Balance' ? 'selected' : ''}>Balance</option>
+                <option value="Other" ${exerciseTypeCell.innerText === 'Other' ? 'selected' : ''}>Other</option>
+            </select>
+        `;
         caloriesCell.innerHTML = `<input type="number" value="${caloriesCell.innerText}" min="1" required>`;
         noteCell.innerHTML = `<input type="text" value="${noteCell.innerText}">`;
         actionCell.innerHTML = `
-        <button onclick="updateExerciseEntry(${exerciseEntryID})">Update</button>
-        <button onclick="cancelEdit(${exerciseEntryID})">Cancel</button>
-    `;
+            <button onclick="updateExerciseEntry(${exerciseEntryID})">Update</button>
+            <button onclick="cancelEdit(${exerciseEntryID})">Cancel</button>
+        `;
     }
 
     function cancelEdit(exerciseEntryID) {
@@ -121,8 +130,6 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         const [_, trackedDayDateCell, clientNameCell, exerciseNameCell, exerciseTypeCell, caloriesCell, noteCell, actionCell] = row.cells;
 
         // Restore the original values
-        trackedDayDateCell.innerText = row.dataset.originalTrackedDayDate;
-        clientNameCell.innerText = row.dataset.originalClientName;
         exerciseNameCell.innerText = row.dataset.originalExerciseName;
         exerciseTypeCell.innerText = row.dataset.originalExerciseType;
         caloriesCell.innerText = row.dataset.originalCalories;
@@ -135,29 +142,20 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         const row = document.getElementById('exerciseentry-' + exerciseEntryID);
         const [_, trackedDayDateCell, clientNameCell, exerciseNameCell, exerciseTypeCell, caloriesCell, noteCell, actionCell] = row.cells;
 
-        const trackedDayDate = trackedDayDateCell.firstElementChild.value;
-        const clientName = clientNameCell.firstElementChild.value;
         const exerciseName = exerciseNameCell.firstElementChild.value;
         const exerciseType = exerciseTypeCell.firstElementChild.value;
         const calories = caloriesCell.firstElementChild.value;
         const note = noteCell.firstElementChild.value;
-
-        if (calories <= 0) {
-            alert('Calories must be greater than 0');
-            return;
-        }
 
         fetch(`/updateexerciseentry/${exerciseEntryID}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: `trackedDayDate=${encodeURIComponent(trackedDayDate)}&clientName=${encodeURIComponent(clientName)}&exerciseName=${encodeURIComponent(exerciseName)}&exerciseType=${encodeURIComponent(exerciseType)}&calories=${encodeURIComponent(calories)}&note=${encodeURIComponent(note)}`
+            body: `exerciseEntryName=${encodeURIComponent(exerciseName)}&exerciseEntryType=${encodeURIComponent(exerciseType)}&exerciseEntryCalories=${encodeURIComponent(calories)}&exerciseEntryNote=${encodeURIComponent(note)}`
         })
             .then(response => {
                 if (response.ok) {
-                    trackedDayDateCell.innerText = trackedDayDate;
-                    clientNameCell.innerText = clientName;
                     exerciseNameCell.innerText = exerciseName;
                     exerciseTypeCell.innerText = exerciseType;
                     caloriesCell.innerText = calories;

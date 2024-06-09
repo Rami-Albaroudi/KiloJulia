@@ -498,10 +498,15 @@ def deleteStaffClientRecord(staffID, clientID):
 @app.route("/trackeddays", methods=["GET", "POST"])
 def trackeddays():
     if request.method == "POST":
-        clientID = request.form.get("clientID")
+        clientName = request.form.get("clientName")
         trackedDayDate = request.form.get("trackedDayDate")
         trackedDayCalorieTarget = request.form.get("trackedDayCalorieTarget")
         trackedDayNote = request.form.get("trackedDayNote")
+
+        # Fetch the client ID based on the client name
+        clientID = get_client_id_by_name(clientName)
+        if not clientID:
+            return "Client not found.", 400
 
         # Validate the form inputs
         errors = validateTrackedDayForm(
@@ -525,6 +530,14 @@ def trackeddays():
         return render_template(
             "trackeddays.j2", trackeddays=fetchTrackedDays(), clients=fetchClientsDays()
         )
+
+
+def get_client_id_by_name(clientName):
+    query = "SELECT clientID FROM Clients WHERE clientName = %s;"
+    cur = mysql.connection.cursor()
+    cur.execute(query, (clientName,))
+    result = cur.fetchone()
+    return result["clientID"] if result else None
 
 
 # Route for Updating Tracked Days
@@ -763,8 +776,7 @@ def deleteFoodRecord(foodID):
 """ -------- Routes for Food Entries -------- """
 
 
-# TODO: Implement CUD
-@app.route("/foodentries")
+@app.route("/foodentries", methods=["GET"])
 def foodentries():
     query = """
     SELECT 
@@ -787,7 +799,127 @@ def foodentries():
     cur = mysql.connection.cursor()
     cur.execute(query)
     foodentries = cur.fetchall()
-    return render_template("foodentries.j2", foodentries=foodentries)
+    return render_template(
+        "foodentries.j2",
+        foodentries=foodentries,
+        clients=fetch_client_names(),
+        foods=fetch_food_names(),
+    )
+
+
+@app.route("/add_food_entry", methods=["POST"])
+def add_food_entry():
+    trackedDayDate = request.form["trackedDayDate"]
+    clientName = request.form["clientName"]
+    foodName = request.form["foodName"]
+    gramWeight = request.form["gramWeight"]
+    calories = request.form["calories"]
+    note = request.form["note"]
+
+    # Fetch the tracked day ID
+    trackedDayID = get_tracked_day_id(trackedDayDate, clientName)
+    if not trackedDayID:
+        return "Tracked day not found for the given date and client name.", 400
+
+    # Fetch the food ID
+    foodID = get_food_id(foodName)
+    if not foodID:
+        return "Food not found.", 400
+
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute(
+            "INSERT INTO FoodEntries (trackedDayID, foodID, foodEntryCalories, foodEntryGramWeight, foodEntryNote) VALUES (%s, %s, %s, %s, %s);",
+            (trackedDayID, foodID, calories, gramWeight, note),
+        )
+        mysql.connection.commit()
+        return redirect("/foodentries")
+    except IntegrityError:
+        mysql.connection.rollback()
+        return "An error occurred while adding the food entry.", 400
+
+
+@app.route("/update_food_entry/<int:foodEntryID>", methods=["POST"])
+def update_food_entry(foodEntryID):
+    gramWeight = request.form["gramWeight"]
+    calories = request.form["calories"]
+    note = request.form["note"]
+
+    # Validate the input values
+    if not gramWeight or int(gramWeight) < 1:
+        return "Weight must be at least 1 gram.", 400
+    if not calories or int(calories) < 1:
+        return "Calories must be at least 1.", 400
+
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute(
+            "UPDATE FoodEntries SET foodEntryCalories = %s, foodEntryGramWeight = %s, foodEntryNote = %s WHERE foodEntryID = %s;",
+            (calories, gramWeight, note, foodEntryID),
+        )
+        mysql.connection.commit()
+        return "OK"
+    except IntegrityError:
+        mysql.connection.rollback()
+        return "An error occurred while updating the food entry.", 400
+
+
+@app.route("/set_food_null/<int:foodEntryID>", methods=["POST"])
+def set_food_null(foodEntryID):
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute(
+            "UPDATE FoodEntries SET foodID = NULL WHERE foodEntryID = %s;",
+            (foodEntryID,),
+        )
+        mysql.connection.commit()
+        return "OK"
+    except IntegrityError:
+        mysql.connection.rollback()
+        return "An error occurred while removing the food entry.", 400
+
+
+@app.route("/delete_food_entry/<int:foodEntryID>", methods=["POST"])
+def delete_food_entry(foodEntryID):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM FoodEntries WHERE foodEntryID = %s;", (foodEntryID,))
+    mysql.connection.commit()
+    return redirect("/foodentries")
+
+
+def get_tracked_day_id(trackedDayDate, clientName):
+    query = """
+    SELECT TrackedDays.trackedDayID
+    FROM TrackedDays
+    JOIN Clients ON TrackedDays.clientID = Clients.clientID
+    WHERE TrackedDays.trackedDayDate = %s AND Clients.clientName = %s;
+    """
+    cur = mysql.connection.cursor()
+    cur.execute(query, (trackedDayDate, clientName))
+    result = cur.fetchone()
+    return result["trackedDayID"] if result else None
+
+
+def get_food_id(foodName):
+    query = "SELECT foodID FROM Foods WHERE foodName = %s;"
+    cur = mysql.connection.cursor()
+    cur.execute(query, (foodName,))
+    result = cur.fetchone()
+    return result["foodID"] if result else None
+
+
+def fetch_client_names():
+    query = "SELECT clientName FROM Clients;"
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    return cur.fetchall()
+
+
+def fetch_food_names():
+    query = "SELECT foodName FROM Foods;"
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    return cur.fetchall()
 
 
 """ -------- Routes for Exercise Entries -------- """
@@ -797,11 +929,17 @@ def foodentries():
 @app.route("/exerciseentries", methods=["GET", "POST"])
 def exerciseentries():
     if request.method == "POST":
-        trackedDayID = request.form["trackedDayID"]
-        exerciseEntryName = request.form["exerciseEntryName"]
-        exerciseEntryType = request.form["exerciseEntryType"]
-        exerciseEntryCalories = request.form["exerciseEntryCalories"]
-        exerciseEntryNote = request.form["exerciseEntryNote"]
+        trackedDayDate = request.form["trackedDayDate"]
+        clientName = request.form["clientName"]
+        exerciseEntryName = request.form["exerciseName"]
+        exerciseEntryType = request.form["type"]
+        exerciseEntryCalories = request.form["calories"]
+        exerciseEntryNote = request.form["note"]
+
+        # Fetch the tracked day ID
+        trackedDayID = get_tracked_day_id(trackedDayDate, clientName)
+        if not trackedDayID:
+            return "Tracked day not found for the given date and client name.", 400
 
         # Validate the form data
         errors = validateExerciseEntryForm(
@@ -820,9 +958,16 @@ def exerciseentries():
             except IntegrityError:
                 return "An error occurred while adding the exercise entry.", 400
         return render_template(
-            "exerciseentries.j2", exerciseentries=fetchExerciseEntries(), errors=errors
+            "exerciseentries.j2",
+            exerciseentries=fetchExerciseEntries(),
+            errors=errors,
+            clients=fetch_client_names(),
         )
-    return render_template("exerciseentries.j2", exerciseentries=fetchExerciseEntries())
+    return render_template(
+        "exerciseentries.j2",
+        exerciseentries=fetchExerciseEntries(),
+        clients=fetch_client_names(),
+    )
 
 
 # Route for Updating Exercise Entries
@@ -975,7 +1120,27 @@ def fetchClientNamesAndTrackedDays():
     return cur.fetchall()
 
 
-# Listener
+def get_tracked_day_id(trackedDayDate, clientName):
+    query = """
+    SELECT TrackedDays.trackedDayID
+    FROM TrackedDays
+    JOIN Clients ON TrackedDays.clientID = Clients.clientID
+    WHERE TrackedDays.trackedDayDate = %s AND Clients.clientName = %s;
+    """
+    cur = mysql.connection.cursor()
+    cur.execute(query, (trackedDayDate, clientName))
+    result = cur.fetchone()
+    return result["trackedDayID"] if result else None
+
+
+def fetch_client_names():
+    query = "SELECT clientID, clientName FROM Clients;"
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    return cur.fetchall()
+
+
+""" Listener """
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 15835))
     app.run(port=port, debug=True)
