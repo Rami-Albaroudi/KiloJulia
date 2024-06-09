@@ -1,6 +1,6 @@
 <!--
 Citation for the following code:
-Date: 29/05/2024
+Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
 Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
 -->
@@ -102,7 +102,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         row.dataset.originalCaloriesPerGram = foodCaloriesPerGramCell.innerText;
         row.dataset.originalNote = foodNoteCell.innerText;
 
-        foodNameCell.innerHTML = `<input type="text" value="${foodNameCell.innerText}">`;
+        foodNameCell.innerHTML = `<input type="text" value="${foodNameCell.innerText}" required>`;
         foodTypeCell.innerHTML = `
             <select>
                 <option value="Fruits">Fruits</option>
@@ -126,7 +126,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
                 <option value="Other">Other</option>
             </select>
         `;
-        foodCaloriesPerGramCell.innerHTML = `<input type="number" step="0.01" min="0.01" value="${foodCaloriesPerGramCell.innerText}">`;
+        foodCaloriesPerGramCell.innerHTML = `<input type="number" step="0.01" min="0.01" value="${foodCaloriesPerGramCell.innerText}" required>`;
         foodNoteCell.innerHTML = `<input type="text" value="${foodNoteCell.innerText}">`;
         actionCell.innerHTML = `
             <button onclick="updateFood(${foodID})">Update</button>

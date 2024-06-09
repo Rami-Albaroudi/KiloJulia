@@ -1,6 +1,6 @@
 <!--
 Citation for the following code:
-Date: 29/05/2024
+Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
 Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
 -->
@@ -91,8 +91,8 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         row.dataset.originalStaffName = staffNameCell.innerText;
         row.dataset.originalClientName = clientNameCell.innerText;
 
-        staffNameCell.innerHTML = `<input type="text" value="${staffNameCell.innerText}" list="staffNames">`;
-        clientNameCell.innerHTML = `<input type="text" value="${clientNameCell.innerText}" list="clientNames">`;
+        staffNameCell.innerHTML = `<input type="text" value="${staffNameCell.innerText}" list="staffNames" placeholder="Search Staff..." required>`;
+        clientNameCell.innerHTML = `<input type="text" value="${clientNameCell.innerText}" list="clientNames" placeholder="Search Clients..." required>`;
         actionCell.innerHTML = `
         <button onclick="updateStaffclient('${staffID}', '${clientID}')">Update</button>
         <button onclick="cancelEdit('${staffID}', '${clientID}')">Cancel</button>

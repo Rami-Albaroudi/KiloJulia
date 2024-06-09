@@ -6,7 +6,7 @@ Adapted from https://github.com/osu-cs340-ecampus/flask-starter-app with signifi
 """
 
 # Imports
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect
 from flask_mysqldb import MySQL
 from MySQLdb import IntegrityError
 import os
@@ -1142,5 +1142,5 @@ def fetch_client_names():
 
 """ Listener """
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 15835))
+    port = int(os.environ.get("PORT", 15834))
     app.run(port=port, debug=True)

@@ -11,7 +11,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 
 {% block content %}
 <h3>Tracked Days Listing</h3>
-
+<h4 style="text-align: center;"><i><b>Instructions:</b> You cannot modify a tracked day's date or client after creation. Please delete and re-create the entry if those fields are incorrect. Total Calories and Calorie Balance are calculated fields and cannot be entered during entry modification.</i></h4>
 <!-- Regular table to display Tracked Days records -->
 <table>
     <thead>
@@ -51,6 +51,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 <!-- Form to INSERT entries into the Tracked Days table -->
 <form method="POST" action="{{ url_for('trackeddays') }}" onsubmit="return addTrackedDay(event)">
     <h3>Add Tracked Day</h3>
+    <h4 style="text-align: center;"><i><b>Instructions:</b>  Total Calories and Calorie Balance are calculated fields and cannot be entered during entry creation.</i></h4>
     <table>
         <thead>
             <tr>

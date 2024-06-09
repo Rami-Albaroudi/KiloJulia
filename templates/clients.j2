@@ -128,9 +128,9 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             <option value="Female">Female</option>
         </select>
     `;
-        clientAgeCell.innerHTML = `<input type="number" value="${clientAgeCell.innerText}">`;
-        clientHeightCell.innerHTML = `<input type="number" step="0.1" value="${clientHeightCell.innerText}">`;
-        clientWeightCell.innerHTML = `<input type="number" step="0.1" value="${clientWeightCell.innerText}">`;
+        clientAgeCell.innerHTML = `<input type="number" value="${clientAgeCell.innerText}" min="1">`;
+        clientHeightCell.innerHTML = `<input type="number" step="0.1" value="${clientHeightCell.innerText}" min="0.1">`;
+        clientWeightCell.innerHTML = `<input type="number" step="0.1" value="${clientWeightCell.innerText}" min="0.1">`;
         clientActivityLevelCell.innerHTML = `
         <select>
             <option value="Sedentary">Sedentary</option>
@@ -140,7 +140,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             <option value="Athlete">Athlete</option>
         </select>
     `;
-        clientCalorieTargetCell.innerHTML = `<input type="number" value="${clientCalorieTargetCell.innerText}">`;
+        clientCalorieTargetCell.innerHTML = `<input type="number" value="${clientCalorieTargetCell.innerText}" min="1">`;
         clientNoteCell.innerHTML = `<input type="text" value="${clientNoteCell.innerText}">`;
         actionCell.innerHTML = `
         <button onclick="updateClient(${clientID})">Update</button>
