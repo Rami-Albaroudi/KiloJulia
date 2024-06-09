@@ -2,7 +2,12 @@
 Citation for the following code:
 Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
-Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+Primarily original work with some code snippets/functions adapted from:
+https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api
+https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/
 -->
 
 {% extends "template.j2" %}
@@ -13,6 +18,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 <h3>Exercise Entries Listing</h3>
 <h4 style="text-align: center;"><i><b>Instructions:</b> You cannot modify an exercise entry's associated client or
         tracked day directly. Please delete and re-create the entry if those fields are incorrect.</i></h4>
+<!-- Dynamic table to display ExerciseEntries records using READ operation. Includes Edit and Delete functionality. -->
 <table>
     <thead>
         <tr>
@@ -51,6 +57,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 <h3>Add New Exercise Entry</h3>
 <h4 style="text-align: center;"><i><b>Instructions:</b> You must first create the tracked day entry before attempting
         to add an exercise entry to that tracked day's log.</i></h4>
+<!-- Form to CREATE entries in the ExerciseEntries table -->
 <form method="POST" action="{{ url_for('exerciseentries') }}" onsubmit="return addExerciseEntry(event)">
     <table>
         <thead>
@@ -94,19 +101,16 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     </table>
 </form>
 
-
-
 <script>
+    // Function to change the display of the table rows when they are being edited
     function editExerciseEntry(exerciseEntryID) {
         const row = document.getElementById('exerciseentry-' + exerciseEntryID);
         const [_, trackedDayDateCell, clientNameCell, exerciseNameCell, exerciseTypeCell, caloriesCell, noteCell, actionCell] = row.cells;
-
         // Store the original values in case the edit is cancelled
         row.dataset.originalExerciseName = exerciseNameCell.innerText;
         row.dataset.originalExerciseType = exerciseTypeCell.innerText;
         row.dataset.originalCalories = caloriesCell.innerText;
         row.dataset.originalNote = noteCell.innerText;
-
         exerciseNameCell.innerHTML = `<input type="text" value="${exerciseNameCell.innerText}" required>`;
         exerciseTypeCell.innerHTML = `
             <select required>
@@ -125,23 +129,22 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         `;
     }
 
+    // Function to restore the row values if an edit is cancelled
     function cancelEdit(exerciseEntryID) {
         const row = document.getElementById('exerciseentry-' + exerciseEntryID);
         const [_, trackedDayDateCell, clientNameCell, exerciseNameCell, exerciseTypeCell, caloriesCell, noteCell, actionCell] = row.cells;
-
         // Restore the original values
         exerciseNameCell.innerText = row.dataset.originalExerciseName;
         exerciseTypeCell.innerText = row.dataset.originalExerciseType;
         caloriesCell.innerText = row.dataset.originalCalories;
         noteCell.innerText = row.dataset.originalNote;
-
         actionCell.innerHTML = `<button onclick="editExerciseEntry(${exerciseEntryID})">Edit</button>`;
     }
 
+    // Function to UPDATE entries in the ExerciseEntries table using the editable table cells
     function updateExerciseEntry(exerciseEntryID) {
         const row = document.getElementById('exerciseentry-' + exerciseEntryID);
         const [_, trackedDayDateCell, clientNameCell, exerciseNameCell, exerciseTypeCell, caloriesCell, noteCell, actionCell] = row.cells;
-
         const exerciseName = exerciseNameCell.firstElementChild.value;
         const exerciseType = exerciseTypeCell.firstElementChild.value;
         const calories = caloriesCell.firstElementChild.value;
@@ -171,6 +174,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             });
     }
 
+    // Function to CREATE entries in the ExerciseEntries table
     function addExerciseEntry(event) {
         event.preventDefault();
         const form = event.target;
@@ -195,6 +199,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         return false;
     }
 
+    // Function to DELETE entries in the ExerciseEntries table
     function confirmDelete(exerciseEntryID) {
         if (confirm('Are you sure you want to delete this record?')) {
             fetch(`/deleteexerciseentry/${exerciseEntryID}`, {

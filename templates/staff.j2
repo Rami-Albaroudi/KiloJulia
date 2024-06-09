@@ -1,8 +1,13 @@
 <!--
 Citation for the following code:
-Date: 23/05/2024
+Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
-Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+Primarily original work with some code snippets/functions adapted from:
+https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api
+https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/
 -->
 
 {% extends "template.j2" %}
@@ -13,7 +18,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 
 <h3>Staff Listing</h3>
 
-<!-- Regular table to display Staff records -->
+<!-- Dynamic table to display Staff records using READ operation. Includes Edit and Delete functionality. -->
 <table>
     <thead>
         <tr>
@@ -45,7 +50,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     </tbody>
 </table>
 
-<!-- Form to INSERT entries into the Staff table -->
+<!-- Form to CREATE entries in the Staff table -->
 <form method="POST" action="{{ url_for('staff') }}" onsubmit="return addStaff(event)">
     <h3>Add Staff</h3>
     <table>
@@ -80,13 +85,11 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     function editStaff(staffID) {
         const row = document.getElementById('staff-' + staffID);
         const [_, staffNameCell, staffEmailCell, staffCapacityCell, staffNoteCell, actionCell] = row.cells;
-
-        // Store the original values in case the edit is cancelled
+        // Stores the original values in case the edit is cancelled
         row.dataset.originalName = staffNameCell.innerText;
         row.dataset.originalEmail = staffEmailCell.innerText;
         row.dataset.originalCapacity = staffCapacityCell.innerText;
         row.dataset.originalNote = staffNoteCell.innerText;
-
         staffNameCell.innerHTML = `<input type="text" value="${staffNameCell.innerText}">`;
         staffEmailCell.innerHTML = `<input type="email" value="${staffEmailCell.innerText}">`;
         staffCapacityCell.innerHTML = `
@@ -102,25 +105,22 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     `;
     }
 
-    // Restore the row values if the edit is cancelled
+    // Function to restore the row values if an edit is cancelled
     function cancelEdit(staffID) {
         const row = document.getElementById('staff-' + staffID);
         const [_, staffNameCell, staffEmailCell, staffCapacityCell, staffNoteCell, actionCell] = row.cells;
-
         // Restore the original values
         staffNameCell.innerText = row.dataset.originalName;
         staffEmailCell.innerText = row.dataset.originalEmail;
         staffCapacityCell.innerText = row.dataset.originalCapacity;
         staffNoteCell.innerText = row.dataset.originalNote;
-
         actionCell.innerHTML = `<button onclick="editStaff(${staffID})">Edit</button>`;
     }
 
-    // Function to UPDATE entries in the Staff table
+    // Function to UPDATE entries in the Staff table using the editable table cells
     function updateStaff(staffID) {
         const row = document.getElementById('staff-' + staffID);
         const [_, staffNameCell, staffEmailCell, staffCapacityCell, staffNoteCell, actionCell] = row.cells;
-
         const staffName = staffNameCell.firstElementChild.value;
         const staffEmail = staffEmailCell.firstElementChild.value;
         const staffCapacity = staffCapacityCell.firstElementChild.value;
@@ -150,7 +150,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             });
     }
 
-    // Function to INSERT entries in the Staff table
+    // Function to CREATE entries in the Staff table
     function addStaff(event) {
         event.preventDefault();
         const form = event.target;

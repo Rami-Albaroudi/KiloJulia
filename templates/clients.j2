@@ -2,7 +2,12 @@
 Citation for the following code:
 Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
-Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+Primarily original work with some code snippets/functions adapted from:
+https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api
+https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/
 -->
 
 {% extends "template.j2" %}
@@ -13,7 +18,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 
 <h3>Clients Listing</h3>
 
-<!-- Regular table to display Client records -->
+<!-- Dynamic table to display Clients records using READ operation. Includes Edit and Delete functionality. -->
 <table>
     <thead>
         <tr>
@@ -55,7 +60,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     </tbody>
 </table>
 
-<!-- Form to INSERT entries into the Client table -->
+<!-- Form to CREATE entries in the Client table -->
 <form method="POST" action="{{ url_for('clients') }}" onsubmit="return addClient(event)">
     <h3>Add Client</h3>
     <table>
@@ -108,7 +113,6 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     function editClient(clientID) {
         const row = document.getElementById('client-' + clientID);
         const [_, clientNameCell, clientEmailCell, clientSexCell, clientAgeCell, clientHeightCell, clientWeightCell, clientActivityLevelCell, clientCalorieTargetCell, clientNoteCell, actionCell] = row.cells;
-
         // Store the original values in case the edit is cancelled
         row.dataset.originalName = clientNameCell.innerText;
         row.dataset.originalEmail = clientEmailCell.innerText;
@@ -119,7 +123,6 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         row.dataset.originalActivityLevel = clientActivityLevelCell.innerText;
         row.dataset.originalCalorieTarget = clientCalorieTargetCell.innerText;
         row.dataset.originalNote = clientNoteCell.innerText;
-
         clientNameCell.innerHTML = `<input type="text" value="${clientNameCell.innerText}">`;
         clientEmailCell.innerHTML = `<input type="email" value="${clientEmailCell.innerText}">`;
         clientSexCell.innerHTML = `
@@ -148,11 +151,10 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     `;
     }
 
-    // Restore the row values if the edit is cancelled
+    // Function to restore the row values if an edit is cancelled
     function cancelEdit(clientID) {
         const row = document.getElementById('client-' + clientID);
         const [_, clientNameCell, clientEmailCell, clientSexCell, clientAgeCell, clientHeightCell, clientWeightCell, clientActivityLevelCell, clientCalorieTargetCell, clientNoteCell, actionCell] = row.cells;
-
         // Restore the original values
         clientNameCell.innerText = row.dataset.originalName;
         clientEmailCell.innerText = row.dataset.originalEmail;
@@ -167,11 +169,10 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         actionCell.innerHTML = `<button onclick="editClient(${clientID})">Edit</button>`;
     }
 
-    // Function to UPDATE entries in the Client table
+    // Function to UPDATE entries in the Clients table using the editable table cells
     function updateClient(clientID) {
         const row = document.getElementById('client-' + clientID);
         const [_, clientNameCell, clientEmailCell, clientSexCell, clientAgeCell, clientHeightCell, clientWeightCell, clientActivityLevelCell, clientCalorieTargetCell, clientNoteCell, actionCell] = row.cells;
-
         const clientName = clientNameCell.firstElementChild.value;
         const clientEmail = clientEmailCell.firstElementChild.value;
         const clientSex = clientSexCell.firstElementChild.value;
@@ -211,7 +212,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             });
     }
 
-    // Function to INSERT entries in the Client table
+    // Function to CREATE entries in the Clients table
     function addClient(event) {
         event.preventDefault();
         const form = event.target;
@@ -236,7 +237,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         return false;
     }
 
-    // Function to DELETE entries in the Client table
+    // Function to DELETE entries in the Clients table
     function confirmDelete(clientID) {
         if (confirm('Are you sure you want to delete this record?')) {
             fetch(`/deleteclient/${clientID}`, {

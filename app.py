@@ -23,8 +23,6 @@ app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 mysql = MySQL(app)
 
 """ -------- Routes for Home -------- """
-
-
 # We want / and /index to lead to the same place.
 @app.route("/")
 @app.route("/index")
@@ -34,8 +32,6 @@ def index():
 
 
 """ -------- Routes for Staff -------- """
-
-
 # Route for Reading and Updating Staff Records
 @app.route("/staff", methods=["GET", "POST"])
 def staff():
@@ -56,12 +52,11 @@ def staff():
             # We use the email not valid error from the email_validator module in order to raise an error if a user's email is invalid.
             except EmailNotValidError:
                 return "Invalid email.", 400
-            # We use the integrity error module in order to raise an error if a user's query would crash the database.
+            # We use the integrity error module in order to raise an error if a user's query would cause an error in the database, like a duplicate entry or an invalid null value
             except IntegrityError:
                 return "A staff member with this email already exists.", 400
         return render_template("staff.j2", staff=fetchStaff(), errors=errors)
     return render_template("staff.j2", staff=fetchStaff())
-
 
 # Route for Updating Staff Records
 @app.route("/updatestaff/<int:staffID>", methods=["POST"])
@@ -82,13 +77,11 @@ def updateStaff(staffID):
             errors.append("A staff member with this email already exists.")
     return ", ".join(errors), 400
 
-
 # Route for Deleting Staff Records
 @app.route("/deletestaff/<int:staffID>", methods=["POST"])
 def deleteStaff(staffID):
     deleteStaffRecord(staffID)
     return redirect("/staff")
-
 
 # Helper function for validation for the Staff Form
 def validateStaffForm(staffName, staffEmail):
@@ -99,13 +92,11 @@ def validateStaffForm(staffName, staffEmail):
         errors.append("Email is required.")
     return errors
 
-
 # Helper function to READ the Staff Records
 def fetchStaff():
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM Staff;")
     return cur.fetchall()
-
 
 # Helper function to CREATE a Staff Record
 def insertStaff(staffName, staffEmail, staffCapacity, staffNote):
@@ -122,12 +113,11 @@ def insertStaff(staffName, staffEmail, staffCapacity, staffNote):
     except EmailNotValidError as e:
         # We use this to roll back the change if there was an error with the query
         mysql.connection.rollback()
+        # Then raise the error message 
         raise e
     except IntegrityError as e:
-        # We use this to roll back the change if there was an error with the query
         mysql.connection.rollback()
         raise e
-
 
 # Helper function to UPDATE a Staff Record
 def updateStaffRecord(staffID, staffName, staffEmail, staffCapacity, staffNote):
@@ -147,18 +137,14 @@ def updateStaffRecord(staffID, staffName, staffEmail, staffCapacity, staffNote):
         mysql.connection.rollback()
         raise e
 
-
 # Helper function to DELETE a Staff record
 def deleteStaffRecord(staffID):
     cur = mysql.connection.cursor()
-    # We don't need validation here because DELETE is pretty simple
+    # We don't need to call the validator function here because DELETE is pretty simple
     cur.execute("DELETE FROM Staff WHERE staffID = %s;", (staffID,))
     mysql.connection.commit()
 
-
 """ -------- Routes for Clients -------- """
-
-
 # Route for Reading and Updating Client Records
 @app.route("/clients", methods=["GET", "POST"])
 def clients():
@@ -197,13 +183,14 @@ def clients():
                     clientNote,
                 )
                 return redirect("/clients")
+            # Check for invalid emails
             except EmailNotValidError:
                 return "Invalid email.", 400
+            # Check for possible data integrity errors
             except IntegrityError:
                 return "A client with this email already exists.", 400
         return render_template("clients.j2", clients=fetchClients(), errors=errors)
     return render_template("clients.j2", clients=fetchClients())
-
 
 # Route for Updating Client Records
 @app.route("/updateclient/<int:clientID>", methods=["POST"])
@@ -247,13 +234,11 @@ def updateClient(clientID):
             errors.append("A client with this email already exists.")
     return ", ".join(errors), 400
 
-
 # Route for Deleting Client Records
 @app.route("/deleteclient/<int:clientID>", methods=["POST"])
 def deleteClient(clientID):
     deleteClientRecord(clientID)
     return redirect("/clients")
-
 
 # Helper function for validation for the Client Form
 def validateClientForm(
@@ -274,13 +259,11 @@ def validateClientForm(
         errors.append("Invalid calorie target. Must be greater than 0.")
     return errors
 
-
 # Helper function to READ the Client Records
 def fetchClients():
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM Clients;")
     return cur.fetchall()
-
 
 # Helper function to CREATE a Client Record
 def insertClient(
@@ -318,7 +301,6 @@ def insertClient(
     except IntegrityError as e:
         mysql.connection.rollback()
         raise e
-
 
 # Helper function to UPDATE a Client Record
 def updateClientRecord(
@@ -359,7 +341,6 @@ def updateClientRecord(
         mysql.connection.rollback()
         raise e
 
-
 # Helper function to DELETE a Client record
 def deleteClientRecord(clientID):
     cur = mysql.connection.cursor()
@@ -368,14 +349,13 @@ def deleteClientRecord(clientID):
 
 
 """ -------- Routes for Staff-Client Assignments -------- """
-
-
 # Route for Reading and Updating Staff-Client Assignments
 @app.route("/staffclients", methods=["GET", "POST"])
 def staffclients():
     if request.method == "POST":
         staffName = request.form["searchStaff"]
         clientName = request.form["searchClient"]
+        # Retrieve staff and client names to make using the form easier
         staffID = getStaffByName(staffName)
         clientID = getClientByName(clientName)
         if staffID and clientID:
@@ -393,7 +373,6 @@ def staffclients():
         clients=fetchClientsAssignments(),
     )
 
-
 # Route for Updating Staff-Client Assignments
 @app.route("/updatestaffclient/<int:staffID>/<int:clientID>", methods=["POST"])
 def updateStaffClient(staffID, clientID):
@@ -410,13 +389,11 @@ def updateStaffClient(staffID, clientID):
     else:
         return "Invalid staff or client name.", 400
 
-
 # Route for Deleting Staff-Client Assignments
 @app.route("/deletestaffclient/<int:staffID>/<int:clientID>", methods=["POST"])
 def deleteStaffClient(staffID, clientID):
     deleteStaffClientRecord(staffID, clientID)
     return redirect("/staffclients")
-
 
 # Helper function to READ Staff-Client Assignments
 def fetchStaffClients():
@@ -430,13 +407,11 @@ def fetchStaffClients():
     cur.execute(query)
     return cur.fetchall()
 
-
 # Helper function to READ Staff Records
 def fetchStaff():
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM Staff;")
     return cur.fetchall()
-
 
 # Helper function to READ Client Records
 def fetchClientsAssignments():
@@ -444,22 +419,19 @@ def fetchClientsAssignments():
     cur.execute("SELECT * FROM Clients;")
     return cur.fetchall()
 
-
-# Helper function to get Staff ID by Name
+# Helper function to get Staff ID by Name since the users will enter names and not IDs
 def getStaffByName(staffName):
     cur = mysql.connection.cursor()
     cur.execute("SELECT staffID FROM Staff WHERE staffName = %s;", (staffName,))
     result = cur.fetchone()
     return result["staffID"] if result else None
 
-
-# Helper function to get Client ID by Name
+# Helper function to get Client ID by Name since the users will enter names and not IDs
 def getClientByName(clientName):
     cur = mysql.connection.cursor()
     cur.execute("SELECT clientID FROM Clients WHERE clientName = %s;", (clientName,))
     result = cur.fetchone()
     return result["clientID"] if result else None
-
 
 # Helper function to CREATE a Staff-Client Assignment
 def addStaffClientRecord(staffID, clientID):
@@ -470,7 +442,6 @@ def addStaffClientRecord(staffID, clientID):
     )
     mysql.connection.commit()
 
-
 # Helper function to UPDATE a Staff-Client Assignment
 def updateStaffClientRecord(staffID, clientID, newStaffID, newClientID):
     cur = mysql.connection.cursor()
@@ -479,7 +450,6 @@ def updateStaffClientRecord(staffID, clientID, newStaffID, newClientID):
         (newStaffID, newClientID, staffID, clientID),
     )
     mysql.connection.commit()
-
 
 # Helper function to DELETE a Staff-Client Assignment
 def deleteStaffClientRecord(staffID, clientID):
@@ -490,10 +460,7 @@ def deleteStaffClientRecord(staffID, clientID):
     )
     mysql.connection.commit()
 
-
 """ -------- Routes for Tracked Days -------- """
-
-
 # Route for Reading and Creating Tracked Days
 @app.route("/trackeddays", methods=["GET", "POST"])
 def trackeddays():
@@ -502,12 +469,10 @@ def trackeddays():
         trackedDayDate = request.form.get("trackedDayDate")
         trackedDayCalorieTarget = request.form.get("trackedDayCalorieTarget")
         trackedDayNote = request.form.get("trackedDayNote")
-
         # Fetch the client ID based on the client name
-        clientID = get_client_id_by_name(clientName)
+        clientID = getClientNameDays(clientName)
         if not clientID:
             return "Client not found.", 400
-
         # Validate the form inputs
         errors = validateTrackedDayForm(
             clientID, trackedDayDate, trackedDayCalorieTarget
@@ -531,14 +496,13 @@ def trackeddays():
             "trackeddays.j2", trackeddays=fetchTrackedDays(), clients=fetchClientsDays()
         )
 
-
-def get_client_id_by_name(clientName):
+# Tie the entered client name back to the client ID for the search boxes
+def getClientNameDays(clientName):
     query = "SELECT clientID FROM Clients WHERE clientName = %s;"
     cur = mysql.connection.cursor()
     cur.execute(query, (clientName,))
     result = cur.fetchone()
     return result["clientID"] if result else None
-
 
 # Route for Updating Tracked Days
 @app.route("/updatetrackedday/<int:trackedDayID>", methods=["POST"])
@@ -547,7 +511,6 @@ def updateTrackedDay(trackedDayID):
     trackedDayDate = request.form.get("trackedDayDate")
     trackedDayCalorieTarget = request.form.get("trackedDayCalorieTarget")
     trackedDayNote = request.form.get("trackedDayNote")
-
     # Validate the form inputs
     errors = validateTrackedDayForm(clientID, trackedDayDate, trackedDayCalorieTarget)
     if not errors:
@@ -564,13 +527,11 @@ def updateTrackedDay(trackedDayID):
             return "Error updating tracked day.", 400
     return ", ".join(errors), 400
 
-
 # Route for Deleting Tracked Days
 @app.route("/deletetrackedday/<int:trackedDayID>", methods=["POST"])
 def deleteTrackedDay(trackedDayID):
     deleteTrackedDayRecord(trackedDayID)
     return redirect("/trackeddays")
-
 
 # Helper function for validation for the Tracked Day Form
 def validateTrackedDayForm(clientID, trackedDayDate, trackedDayCalorieTarget):
@@ -585,7 +546,6 @@ def validateTrackedDayForm(clientID, trackedDayDate, trackedDayCalorieTarget):
         errors.append("Calorie target must be at least 1.")
     return errors
 
-
 # Helper function to CREATE a Tracked Day Record
 def insertTrackedDay(clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote):
     cur = mysql.connection.cursor()
@@ -598,7 +558,6 @@ def insertTrackedDay(clientID, trackedDayDate, trackedDayCalorieTarget, trackedD
     except IntegrityError as e:
         mysql.connection.rollback()
         raise e
-
 
 # Helper function to UPDATE a Tracked Day Record
 def updateTrackedDayRecord(
@@ -627,13 +586,11 @@ def updateTrackedDayRecord(
         print(f"IntegrityError: {e}")
         raise e
 
-
 # Helper function to DELETE a Tracked Day Record
 def deleteTrackedDayRecord(trackedDayID):
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM TrackedDays WHERE trackedDayID = %s;", (trackedDayID,))
     mysql.connection.commit()
-
 
 # Helper function to READ the Tracked Days Records
 def fetchTrackedDays():
@@ -662,17 +619,13 @@ def fetchTrackedDays():
     cur.execute(query)
     return cur.fetchall()
 
-
 # Helper function to READ the Clients Records
 def fetchClientsDays():
     cur = mysql.connection.cursor()
     cur.execute("SELECT clientID, clientName FROM Clients;")
     return cur.fetchall()
 
-
 """ -------- Routes for Foods -------- """
-
-
 # Route for Reading and Updating Food Records
 @app.route("/foods", methods=["GET", "POST"])
 def foods():
@@ -692,7 +645,6 @@ def foods():
         return render_template("foods.j2", foods=fetchFoods(), errors=errors)
     return render_template("foods.j2", foods=fetchFoods())
 
-
 # Route for Updating Food Records
 @app.route("/updatefood/<int:foodID>", methods=["POST"])
 def updateFood(foodID):
@@ -709,13 +661,11 @@ def updateFood(foodID):
             errors.append("A food with this name already exists.")
     return ", ".join(errors), 400
 
-
 # Route for Deleting Food Records
 @app.route("/deletefood/<int:foodID>", methods=["POST"])
 def deleteFood(foodID):
     deleteFoodRecord(foodID)
     return redirect("/foods")
-
 
 # Helper function for validation for the Food Form
 def validateFoodForm(foodName, foodType, foodCaloriesPerGram):
@@ -730,13 +680,11 @@ def validateFoodForm(foodName, foodType, foodCaloriesPerGram):
         errors.append("Calories per gram cannot be less than 0.01.")
     return errors
 
-
 # Helper function to READ the Food Records
 def fetchFoods():
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM Foods;")
     return cur.fetchall()
-
 
 # Helper function to CREATE a Food Record
 def insertFood(foodName, foodType, foodCaloriesPerGram, foodNote):
@@ -751,7 +699,6 @@ def insertFood(foodName, foodType, foodCaloriesPerGram, foodNote):
         mysql.connection.rollback()
         raise e
 
-
 # Helper function to UPDATE a Food Record
 def updateFoodRecord(foodID, foodName, foodType, foodCaloriesPerGram, foodNote):
     cur = mysql.connection.cursor()
@@ -765,17 +712,14 @@ def updateFoodRecord(foodID, foodName, foodType, foodCaloriesPerGram, foodNote):
         mysql.connection.rollback()
         raise e
 
-
 # Helper function to DELETE a Food record
 def deleteFoodRecord(foodID):
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM Foods WHERE foodID = %s;", (foodID,))
     mysql.connection.commit()
 
-
 """ -------- Routes for Food Entries -------- """
-
-
+# Route for displaying Food Entries
 @app.route("/foodentries", methods=["GET"])
 def foodentries():
     query = """
@@ -802,30 +746,27 @@ def foodentries():
     return render_template(
         "foodentries.j2",
         foodentries=foodentries,
-        clients=fetch_client_names(),
-        foods=fetch_food_names(),
+        clients=fetchClientNamesFoodEntries(),
+        foods=fetchFoodNames(),
     )
 
-
-@app.route("/add_food_entry", methods=["POST"])
-def add_food_entry():
+# Route for adding food entries
+@app.route("/addfoodentry", methods=["POST"])
+def addfoodentry():
     trackedDayDate = request.form["trackedDayDate"]
     clientName = request.form["clientName"]
     foodName = request.form["foodName"]
     gramWeight = request.form["gramWeight"]
     calories = request.form["calories"]
     note = request.form["note"]
-
-    # Fetch the tracked day ID
-    trackedDayID = get_tracked_day_id(trackedDayDate, clientName)
+    # Fetch the tracked day ID since tracked days are an FK inside food entries
+    trackedDayID = getTrackedDayFoodEntries(trackedDayDate, clientName)
     if not trackedDayID:
         return "Tracked day not found for the given date and client name.", 400
-
-    # Fetch the food ID
-    foodID = get_food_id(foodName)
+    # Fetch the food ID if there is one, otherwise set it to NULL (Foods are Nullable in Food Entries)
+    foodID = fetchFoods(foodName)
     if not foodID:
-        return "Food not found.", 400
-
+        foodID = None
     cur = mysql.connection.cursor()
     try:
         cur.execute(
@@ -838,19 +779,17 @@ def add_food_entry():
         mysql.connection.rollback()
         return "An error occurred while adding the food entry.", 400
 
-
-@app.route("/update_food_entry/<int:foodEntryID>", methods=["POST"])
-def update_food_entry(foodEntryID):
+# Route for updating food entries
+@app.route("/updatefoodentry/<int:foodEntryID>", methods=["POST"])
+def updatefoodentry(foodEntryID):
     gramWeight = request.form["gramWeight"]
     calories = request.form["calories"]
     note = request.form["note"]
-
     # Validate the input values
     if not gramWeight or int(gramWeight) < 1:
         return "Weight must be at least 1 gram.", 400
     if not calories or int(calories) < 1:
         return "Calories must be at least 1.", 400
-
     cur = mysql.connection.cursor()
     try:
         cur.execute(
@@ -863,9 +802,9 @@ def update_food_entry(foodEntryID):
         mysql.connection.rollback()
         return "An error occurred while updating the food entry.", 400
 
-
-@app.route("/set_food_null/<int:foodEntryID>", methods=["POST"])
-def set_food_null(foodEntryID):
+# Route for setting a Food Name to NULL in a Food Entry, since the relationship is nullable
+@app.route("/setfoodnull/<int:foodEntryID>", methods=["POST"])
+def setfoodnull(foodEntryID):
     cur = mysql.connection.cursor()
     try:
         cur.execute(
@@ -878,16 +817,16 @@ def set_food_null(foodEntryID):
         mysql.connection.rollback()
         return "An error occurred while removing the food entry.", 400
 
-
-@app.route("/delete_food_entry/<int:foodEntryID>", methods=["POST"])
-def delete_food_entry(foodEntryID):
+# Route for deleting Food Entries
+@app.route("/deletefoodentry/<int:foodEntryID>", methods=["POST"])
+def deletefoodentry(foodEntryID):
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM FoodEntries WHERE foodEntryID = %s;", (foodEntryID,))
     mysql.connection.commit()
     return redirect("/foodentries")
 
-
-def get_tracked_day_id(trackedDayDate, clientName):
+# Route to retrieved the tracked day associated with a food entry using the client name and date
+def getTrackedDayFoodEntries(trackedDayDate, clientName):
     query = """
     SELECT TrackedDays.trackedDayID
     FROM TrackedDays
@@ -899,32 +838,29 @@ def get_tracked_day_id(trackedDayDate, clientName):
     result = cur.fetchone()
     return result["trackedDayID"] if result else None
 
-
-def get_food_id(foodName):
+# Route to get the food ID using the food name
+def fetchFoods(foodName):
     query = "SELECT foodID FROM Foods WHERE foodName = %s;"
     cur = mysql.connection.cursor()
     cur.execute(query, (foodName,))
     result = cur.fetchone()
     return result["foodID"] if result else None
 
-
-def fetch_client_names():
+# Route to get Client Names 
+def fetchClientNamesFoodEntries():
     query = "SELECT clientName FROM Clients;"
     cur = mysql.connection.cursor()
     cur.execute(query)
     return cur.fetchall()
 
-
-def fetch_food_names():
+# Route to get Food Names
+def fetchFoodNames():
     query = "SELECT foodName FROM Foods;"
     cur = mysql.connection.cursor()
     cur.execute(query)
     return cur.fetchall()
 
-
 """ -------- Routes for Exercise Entries -------- """
-
-
 # Route for Reading and Creating Exercise Entries
 @app.route("/exerciseentries", methods=["GET", "POST"])
 def exerciseentries():
@@ -935,12 +871,10 @@ def exerciseentries():
         exerciseEntryType = request.form["type"]
         exerciseEntryCalories = request.form["calories"]
         exerciseEntryNote = request.form["note"]
-
         # Fetch the tracked day ID
-        trackedDayID = get_tracked_day_id(trackedDayDate, clientName)
+        trackedDayID = getTrackedDaysExerciseEntries(trackedDayDate, clientName)
         if not trackedDayID:
             return "Tracked day not found for the given date and client name.", 400
-
         # Validate the form data
         errors = validateExerciseEntryForm(
             exerciseEntryName, exerciseEntryType, exerciseEntryCalories
@@ -961,14 +895,13 @@ def exerciseentries():
             "exerciseentries.j2",
             exerciseentries=fetchExerciseEntries(),
             errors=errors,
-            clients=fetch_client_names(),
+            clients=fetchClientNamesFoodEntries(),
         )
     return render_template(
         "exerciseentries.j2",
         exerciseentries=fetchExerciseEntries(),
-        clients=fetch_client_names(),
+        clients=fetchClientNamesExerciseEntries(),
     )
-
 
 # Route for Updating Exercise Entries
 @app.route("/updateexerciseentry/<int:exerciseEntryID>", methods=["POST"])
@@ -977,7 +910,6 @@ def updateExerciseEntry(exerciseEntryID):
     exerciseEntryType = request.form["exerciseEntryType"]
     exerciseEntryCalories = request.form["exerciseEntryCalories"]
     exerciseEntryNote = request.form["exerciseEntryNote"]
-
     # Validate the form data
     errors = validateExerciseEntryForm(
         exerciseEntryName, exerciseEntryType, exerciseEntryCalories
@@ -996,13 +928,11 @@ def updateExerciseEntry(exerciseEntryID):
             errors.append("An error occurred while updating the exercise entry.")
     return ", ".join(errors), 400
 
-
 # Route for Deleting Exercise Entries
 @app.route("/deleteexerciseentry/<int:exerciseEntryID>", methods=["POST"])
 def deleteExerciseEntry(exerciseEntryID):
     deleteExerciseEntryRecord(exerciseEntryID)
     return redirect("/exerciseentries")
-
 
 # Helper function for validation for the Exercise Entry Form
 def validateExerciseEntryForm(
@@ -1016,7 +946,6 @@ def validateExerciseEntryForm(
     if not exerciseEntryCalories or int(exerciseEntryCalories) <= 0:
         errors.append("Calories must be a positive number.")
     return errors
-
 
 # Helper function to READ the Exercise Entries
 def fetchExerciseEntries():
@@ -1039,7 +968,6 @@ def fetchExerciseEntries():
     cur = mysql.connection.cursor()
     cur.execute(query)
     return cur.fetchall()
-
 
 # Helper function to CREATE an Exercise Entry
 def insertExerciseEntry(
@@ -1066,7 +994,6 @@ def insertExerciseEntry(
         mysql.connection.rollback()
         raise e
 
-
 # Helper function to UPDATE an Exercise Entry
 def updateExerciseEntryRecord(
     exerciseEntryID,
@@ -1092,7 +1019,6 @@ def updateExerciseEntryRecord(
         mysql.connection.rollback()
         raise e
 
-
 # Helper function to DELETE an Exercise Entry
 def deleteExerciseEntryRecord(exerciseEntryID):
     cur = mysql.connection.cursor()
@@ -1100,7 +1026,6 @@ def deleteExerciseEntryRecord(exerciseEntryID):
         "DELETE FROM ExerciseEntries WHERE exerciseEntryID = %s;", (exerciseEntryID,)
     )
     mysql.connection.commit()
-
 
 # Helper function to fetch client names and tracked day dates
 def fetchClientNamesAndTrackedDays():
@@ -1119,8 +1044,8 @@ def fetchClientNamesAndTrackedDays():
     cur.execute(query)
     return cur.fetchall()
 
-
-def get_tracked_day_id(trackedDayDate, clientName):
+# Route to get the tracked dayy ID using the date and client name
+def getTrackedDaysExerciseEntries(trackedDayDate, clientName):
     query = """
     SELECT TrackedDays.trackedDayID
     FROM TrackedDays
@@ -1132,15 +1057,20 @@ def get_tracked_day_id(trackedDayDate, clientName):
     result = cur.fetchone()
     return result["trackedDayID"] if result else None
 
-
-def fetch_client_names():
+# Route to get the client names and IDs
+def fetchClientNamesExerciseEntries():
     query = "SELECT clientID, clientName FROM Clients;"
     cur = mysql.connection.cursor()
     cur.execute(query)
     return cur.fetchall()
 
-
-""" Listener """
+"""
+Citation for the following code:
+Date: 06/06/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Adapted from https://github.com/osu-cs340-ecampus/flask-starter-app with significant modifications
+"""
+""" Listener to host the website """
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 15834))
     app.run(port=port, debug=True)

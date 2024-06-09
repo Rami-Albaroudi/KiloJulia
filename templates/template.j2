@@ -1,6 +1,6 @@
 <!--
 Citation for the following code:
-Date: 09/05/2024
+Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
 Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
 Favicon sourced from: https://github.com/twitter/twemoji/blob/master/assets/svg/1f955.svg
@@ -24,7 +24,7 @@ Favicon sourced from: https://github.com/twitter/twemoji/blob/master/assets/svg/
 
 <body>
     {% block header %}
-    <!-- Global Navigation -->
+    <!-- Global Navigation and Header -->
     <nav>
         <h1>KiloJulia
             <img src="/static/favicon/favicon-32x32.png" alt="Logo" width="25" height="25">
@@ -43,10 +43,11 @@ Favicon sourced from: https://github.com/twitter/twemoji/blob/master/assets/svg/
     {% endblock %}
 
     {% block content %}
-    <!-- content goes here -->
+    <!-- Each page's content will be inserted here -->
     {% endblock %}
 
     {% block footer %}
+    <!-- Footer -->
     <footer>
         <b>
             <p>© Rami Albaroudi, Mohamed Saud, 2024</p>

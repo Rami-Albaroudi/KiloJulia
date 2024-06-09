@@ -2,7 +2,12 @@
 Citation for the following code:
 Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
-Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+Primarily original work with some code snippets/functions adapted from:
+https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api
+https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/
 -->
 
 {% extends "template.j2" %}
@@ -14,6 +19,8 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 <h4 style="text-align: center;"><i><b>Instructions:</b> You cannot modify a food entry's associated client or tracked
         day directly. Please delete and re-create the entry if those fields are incorrect. Food Name can be set to
         null/none, but cannot be swapped.</i></h4>
+
+<!-- Dynamic table to display FoodEntries records using READ operation. Includes Edit and Delete functionality. -->
 <table>
     <thead>
         <tr>
@@ -56,7 +63,8 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 <h3>Add Food Entry</h3>
 <h4 style="text-align: center;"><i><b>Instructions:</b> You must first create the tracked day entry before attempting
         to add a food entry to that tracked day's log.</i></h4>
-<form method="POST" action="{{ url_for('add_food_entry') }}" onsubmit="return addFoodEntry(event)">
+<!-- Form to CREATE entries in the FoodEntries table -->
+<form method="POST" action="{{ url_for('addfoodentry') }}" onsubmit="return addFoodEntry(event)">
     <table>
         <thead>
             <tr>
@@ -82,8 +90,8 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
                     </datalist>
                 </td>
                 <td>
-                    <input type="text" id="searchFood" name="foodName" list="foodNames" placeholder="Search Foods..."
-                        required>
+                    <input type="text" id="searchFood" name="foodName" list="foodNames"
+                        placeholder="Search Foods or leave blank for none...">
                     <datalist id="foodNames">
                         {% for food in foods %}
                         <option value="{{ food.foodName }}">
@@ -100,48 +108,41 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 </form>
 
 <script>
+    // Function to change the display of the table rows when they are being edited
     function editFoodEntry(foodEntryID) {
-        let row = document.getElementById('foodentry-' + foodEntryID);
-        let cells = row.getElementsByTagName('td');
-
-        let gramWeight = cells[4].innerText;
-        let calories = cells[5].innerText;
-        let note = cells[6].innerText;
-
-        // Store the original values in case the edit is cancelled
-        row.dataset.originalGramWeight = gramWeight;
-        row.dataset.originalCalories = calories;
-        row.dataset.originalNote = note;
-
-        cells[4].innerHTML = '<input type="number" value="' + gramWeight + '" min="1" required>';
-        cells[5].innerHTML = '<input type="number" value="' + calories + '" min="1" required>';
-        cells[6].innerHTML = '<input type="text" value="' + note + '">';
-        cells[7].innerHTML = `
-            <button onclick="updateFoodEntry(${foodEntryID})">Update</button>
-            <button onclick="cancelEdit(${foodEntryID})">Cancel</button>
-        `;
+        const row = document.getElementById('foodentry-' + foodEntryID);
+        const [_, trackedDayDateCell, clientNameCell, foodNameCell, gramWeightCell, caloriesCell, noteCell, actionCell] = row.cells;
+        // Stores the original values in case the edit is cancelled
+        row.dataset.originalGramWeight = gramWeightCell.innerText;
+        row.dataset.originalCalories = caloriesCell.innerText;
+        row.dataset.originalNote = noteCell.innerText;
+        gramWeightCell.innerHTML = `<input type="number" value="${gramWeightCell.innerText}" min="1" required>`;
+        caloriesCell.innerHTML = `<input type="number" value="${caloriesCell.innerText}" min="1" required>`;
+        noteCell.innerHTML = `<input type="text" value="${noteCell.innerText}">`;
+        actionCell.innerHTML = `
+        <button onclick="updateFoodEntry(${foodEntryID})">Update</button>
+        <button onclick="cancelEdit(${foodEntryID})">Cancel</button>
+    `;
     }
 
+    // Function to restore the row values if an edit is cancelled
     function cancelEdit(foodEntryID) {
-        let row = document.getElementById('foodentry-' + foodEntryID);
-        let cells = row.getElementsByTagName('td');
-
+        const row = document.getElementById('foodentry-' + foodEntryID);
+        const [_, trackedDayDateCell, clientNameCell, foodNameCell, gramWeightCell, caloriesCell, noteCell, actionCell] = row.cells;
         // Restore the original values
-        cells[4].innerText = row.dataset.originalGramWeight;
-        cells[5].innerText = row.dataset.originalCalories;
-        cells[6].innerText = row.dataset.originalNote;
-
-        cells[7].innerHTML = `<button onclick="editFoodEntry(${foodEntryID})">Edit</button>`;
+        gramWeightCell.innerText = row.dataset.originalGramWeight;
+        caloriesCell.innerText = row.dataset.originalCalories;
+        noteCell.innerText = row.dataset.originalNote;
+        actionCell.innerHTML = `<button onclick="editFoodEntry(${foodEntryID})">Edit</button>`;
     }
 
+    // Function to UPDATE entries in the FoodEntries table using the editable table cells
     function updateFoodEntry(foodEntryID) {
-        let row = document.getElementById('foodentry-' + foodEntryID);
-        let cells = row.getElementsByTagName('td');
-
-        // Get the updated values from the input fields
-        let gramWeight = cells[4].getElementsByTagName('input')[0].value;
-        let calories = cells[5].getElementsByTagName('input')[0].value;
-        let note = cells[6].getElementsByTagName('input')[0].value;
+        const row = document.getElementById('foodentry-' + foodEntryID);
+        const [_, trackedDayDateCell, clientNameCell, foodNameCell, gramWeightCell, caloriesCell, noteCell, actionCell] = row.cells;
+        const gramWeight = gramWeightCell.firstElementChild.value;
+        const calories = caloriesCell.firstElementChild.value;
+        const note = noteCell.firstElementChild.value;
 
         // Validate the input values
         if (!gramWeight || gramWeight < 1) {
@@ -162,10 +163,10 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         })
             .then(response => {
                 if (response.ok) {
-                    cells[4].innerText = gramWeight;
-                    cells[5].innerText = calories;
-                    cells[6].innerText = note;
-                    cells[7].innerHTML = `<button onclick="editFoodEntry(${foodEntryID})">Edit</button>`;
+                    gramWeightCell.innerText = gramWeight;
+                    caloriesCell.innerText = calories;
+                    noteCell.innerText = note;
+                    actionCell.innerHTML = `<button onclick="editFoodEntry(${foodEntryID})">Edit</button>`;
                 } else {
                     response.text().then(error => alert('Failed to update record. ' + error));
                 }
@@ -176,18 +177,18 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             });
     }
 
+    // Function to set Food FK to NULL for a record in the FoodEntries table
     function setFoodNull(foodEntryID) {
         let row = document.getElementById('foodentry-' + foodEntryID);
         let cells = row.getElementsByTagName('td');
         let foodName = cells[3].innerText;
-
         if (foodName.trim() === "None") {
             alert("This entry already has no associated food record.");
             return;
         }
 
         if (confirm('Are you sure you want to remove the food from this entry?')) {
-            fetch(`/set_food_null/${foodEntryID}`, {
+            fetch(`/setfoodnull/${foodEntryID}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -195,8 +196,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             })
                 .then(response => {
                     if (response.ok) {
-                        // Optionally, update the UI to reflect the change
-                        cells[3].innerText = 'None'; // Clear the food name cell
+                        cells[3].innerText = 'None'; // Clear the food name cell for the UI
                     } else {
                         response.text().then(error => alert('Failed to remove food. ' + error));
                     }
@@ -208,28 +208,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         }
     }
 
-    function confirmDelete(foodEntryID) {
-        if (confirm('Are you sure you want to delete this record?')) {
-            fetch(`/delete_food_entry/${foodEntryID}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        document.getElementById('foodentry-' + foodEntryID).remove();
-                    } else {
-                        alert('Failed to delete record.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to delete record.');
-                });
-        }
-    }
-
+    // Function to CREATE entries in the FoodEntries table
     function addFoodEntry(event) {
         event.preventDefault();
         const form = event.target;
@@ -253,6 +232,31 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 
         return false;
     }
+
+    // Function to DELETE entries in the FoodEntries table
+    function confirmDelete(foodEntryID) {
+        if (confirm('Are you sure you want to delete this record?')) {
+            fetch(`/deletefoodentry/${foodEntryID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById('foodentry-' + foodEntryID).remove();
+                    } else {
+                        alert('Failed to delete record.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to delete record.');
+                });
+        }
+    }
+
+
 </script>
 
 

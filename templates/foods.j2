@@ -2,7 +2,12 @@
 Citation for the following code:
 Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
-Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+Primarily original work with some code snippets/functions adapted from:
+https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api
+https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/
 -->
 
 {% extends "template.j2" %}
@@ -13,6 +18,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 
 <h3>Foods Listing</h3>
 
+<!-- Dynamic table to display Foods records using READ operation. Includes Edit and Delete functionality. -->
 <table>
     <thead>
         <tr>
@@ -44,6 +50,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     </tbody>
 </table>
 
+<!-- Form to CREATE entries in the Foods table -->
 <form method="POST" action="{{ url_for('foods') }}" onsubmit="return addFood(event)">
     <h3>Add Food</h3>
     <table>
@@ -92,16 +99,15 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 </form>
 
 <script>
+    // Function to change the display of the table rows when they are being edited
     function editFood(foodID) {
         const row = document.getElementById('food-' + foodID);
         const [_, foodNameCell, foodTypeCell, foodCaloriesPerGramCell, foodNoteCell, actionCell] = row.cells;
-
         // Store the original values in case the edit is cancelled
         row.dataset.originalName = foodNameCell.innerText;
         row.dataset.originalType = foodTypeCell.innerText;
         row.dataset.originalCaloriesPerGram = foodCaloriesPerGramCell.innerText;
         row.dataset.originalNote = foodNoteCell.innerText;
-
         foodNameCell.innerHTML = `<input type="text" value="${foodNameCell.innerText}" required>`;
         foodTypeCell.innerHTML = `
             <select>
@@ -134,10 +140,10 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         `;
     }
 
+    // Function to restore the row values if an edit is cancelled
     function cancelEdit(foodID) {
         const row = document.getElementById('food-' + foodID);
         const [_, foodNameCell, foodTypeCell, foodCaloriesPerGramCell, foodNoteCell, actionCell] = row.cells;
-
         // Restore the original values
         foodNameCell.innerText = row.dataset.originalName;
         foodTypeCell.innerText = row.dataset.originalType;
@@ -147,10 +153,10 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         actionCell.innerHTML = `<button onclick="editFood(${foodID})">Edit</button>`;
     }
 
+    // Function to UPDATE entries in the Foods table using the editable table cells
     function updateFood(foodID) {
         const row = document.getElementById('food-' + foodID);
         const [_, foodNameCell, foodTypeCell, foodCaloriesPerGramCell, foodNoteCell, actionCell] = row.cells;
-
         const foodName = foodNameCell.firstElementChild.value;
         const foodType = foodTypeCell.firstElementChild.value;
         const foodCaloriesPerGram = foodCaloriesPerGramCell.firstElementChild.value;
@@ -185,6 +191,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             });
     }
 
+    // Function to CREATE entries in the Foods table
     function addFood(event) {
         event.preventDefault();
         const form = event.target;
@@ -209,6 +216,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
         return false;
     }
 
+    // Function to DELETE entries in the Foods table
     function confirmDelete(foodID) {
         if (confirm('Are you sure you want to delete this record?')) {
             fetch(`/deletefood/${foodID}`, {

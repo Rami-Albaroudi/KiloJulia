@@ -2,7 +2,12 @@
 Citation for the following code:
 Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
-Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+Primarily original work with some code snippets/functions adapted from:
+https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
+https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api
+https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/
 -->
 
 {% extends "template.j2" %}
@@ -13,7 +18,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 
 <h3>Staff-Client Assignment Listing</h3>
 
-<!-- Regular table to display Staff-Client records -->
+<!-- Dynamic table to display StaffClients records using READ operation. Includes Edit and Delete functionality. -->
 <table>
     <thead>
         <tr>
@@ -45,7 +50,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     </tbody>
 </table>
 
-<!-- Form to ASSIGN Staff to Client -->
+<!-- Form to CREATE entries in the StaffClients Table -->
 <form method="POST" action="{{ url_for('staffclients') }}" onsubmit="return addStaffClient(event)">
     <h3>Assign Staff to Client</h3>
     <table>
@@ -83,14 +88,13 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 </form>
 
 <script>
+    // Function to change the display of the table rows when they are being edited
     function editStaffclient(staffID, clientID) {
         const row = document.getElementById('staffclient-' + staffID + '-' + clientID);
         const [_, staffNameCell, __, clientNameCell, actionCell] = row.cells;
-
         // Store the original values in case the edit is cancelled
         row.dataset.originalStaffName = staffNameCell.innerText;
         row.dataset.originalClientName = clientNameCell.innerText;
-
         staffNameCell.innerHTML = `<input type="text" value="${staffNameCell.innerText}" list="staffNames" placeholder="Search Staff..." required>`;
         clientNameCell.innerHTML = `<input type="text" value="${clientNameCell.innerText}" list="clientNames" placeholder="Search Clients..." required>`;
         actionCell.innerHTML = `
@@ -99,21 +103,20 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     `;
     }
 
+    // Function to restore the row values if an edit is cancelled
     function cancelEdit(staffID, clientID) {
         const row = document.getElementById('staffclient-' + staffID + '-' + clientID);
         const [_, staffNameCell, __, clientNameCell, actionCell] = row.cells;
-
         // Restore the original values
         staffNameCell.innerText = row.dataset.originalStaffName;
         clientNameCell.innerText = row.dataset.originalClientName;
-
         actionCell.innerHTML = `<button onclick="editStaffclient('${staffID}', '${clientID}')">Edit</button>`;
     }
 
+    // Function to UPDATE entries in the StaffClients table using the editable table cells
     function updateStaffclient(staffID, clientID) {
         const row = document.getElementById('staffclient-' + staffID + '-' + clientID);
         const [_, staffNameCell, __, clientNameCell, actionCell] = row.cells;
-
         const staffName = staffNameCell.firstElementChild.value;
         const clientName = clientNameCell.firstElementChild.value;
 
@@ -139,28 +142,7 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
             });
     }
 
-    function confirmDelete(staffID, clientID) {
-        if (confirm('Are you sure you want to delete this record?')) {
-            fetch(`/deletestaffclient/${staffID}/${clientID}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        document.getElementById('staffclient-' + staffID + '-' + clientID).remove();
-                    } else {
-                        alert('Failed to delete record.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to delete record.');
-                });
-        }
-    }
-
+    // Function to CREATE entries in the StaffClients table
     function addStaffClient(event) {
         event.preventDefault();
         const form = event.target;
@@ -184,6 +166,30 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
 
         return false;
     }
+
+    // Function to DELETE entries in the StaffClients table
+    function confirmDelete(staffID, clientID) {
+        if (confirm('Are you sure you want to delete this record?')) {
+            fetch(`/deletestaffclient/${staffID}/${clientID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById('staffclient-' + staffID + '-' + clientID).remove();
+                    } else {
+                        alert('Failed to delete record.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to delete record.');
+                });
+        }
+    }
+
 </script>
 
 {% endblock %}
