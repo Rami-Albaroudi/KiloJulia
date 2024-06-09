@@ -2,18 +2,21 @@
 Citation for the following code:
 Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
-Adapted from https://github.com/osu-cs340-ecampus/flask-starter-app with significant modifications
+Copied from https://github.com/osu-cs340-ecampus/flask-starter-app with minor modifications
 """
 
-# Imports
+""" ___________ Imports List ___________ """
 from flask import Flask, render_template, request, redirect
 from flask_mysqldb import MySQL
+# IntegrityError is used to check if a query would create an error in the DB
 from MySQLdb import IntegrityError
 import os
 import database.db_connector as db
+# email_validator is used to check if email inputs are valid without needing to
+# manually check using regex or other methods
 from email_validator import validate_email, EmailNotValidError
 
-# Configure connection to the database
+""" ___________ Database Connection/Configuration ___________ """
 app = Flask(__name__)
 app.config["MYSQL_HOST"] = db.host
 app.config["MYSQL_USER"] = db.user
@@ -22,7 +25,15 @@ app.config["MYSQL_DB"] = db.db
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 mysql = MySQL(app)
 
-""" -------- Routes for Home -------- """
+"""
+Citation for the following code:
+Date: 06/06/2024
+Authors: Rami Albaroudi and Mohamed Saud, Group 13
+Primarily original work, some code snippets/starter code adapted from
+https://github.com/osu-cs340-ecampus/flask-starter-app with significant modifications
+"""
+
+""" ___________ Routes for Home/Index Page ___________ """
 # We want / and /index to lead to the same place.
 @app.route("/")
 @app.route("/index")
@@ -31,7 +42,7 @@ def index():
     return render_template("index.j2")
 
 
-""" -------- Routes for Staff -------- """
+""" ___________ Routes for Staff Page ___________ """
 # Route for Reading and Updating Staff Records
 @app.route("/staff", methods=["GET", "POST"])
 def staff():
@@ -144,7 +155,7 @@ def deleteStaffRecord(staffID):
     cur.execute("DELETE FROM Staff WHERE staffID = %s;", (staffID,))
     mysql.connection.commit()
 
-""" -------- Routes for Clients -------- """
+""" ___________ Routes for Clients Page ___________ """
 # Route for Reading and Updating Client Records
 @app.route("/clients", methods=["GET", "POST"])
 def clients():
@@ -348,7 +359,7 @@ def deleteClientRecord(clientID):
     mysql.connection.commit()
 
 
-""" -------- Routes for Staff-Client Assignments -------- """
+""" ___________ Routes for Staff-Client Assignments Page ___________ """
 # Route for Reading and Updating Staff-Client Assignments
 @app.route("/staffclients", methods=["GET", "POST"])
 def staffclients():
@@ -460,7 +471,7 @@ def deleteStaffClientRecord(staffID, clientID):
     )
     mysql.connection.commit()
 
-""" -------- Routes for Tracked Days -------- """
+""" ___________ Routes for Tracked Days Page ___________ """
 # Route for Reading and Creating Tracked Days
 @app.route("/trackeddays", methods=["GET", "POST"])
 def trackeddays():
@@ -625,7 +636,7 @@ def fetchClientsDays():
     cur.execute("SELECT clientID, clientName FROM Clients;")
     return cur.fetchall()
 
-""" -------- Routes for Foods -------- """
+""" ___________ Routes for Foods Page ___________ """
 # Route for Reading and Updating Food Records
 @app.route("/foods", methods=["GET", "POST"])
 def foods():
@@ -718,7 +729,7 @@ def deleteFoodRecord(foodID):
     cur.execute("DELETE FROM Foods WHERE foodID = %s;", (foodID,))
     mysql.connection.commit()
 
-""" -------- Routes for Food Entries -------- """
+""" ___________ Routes for Food Entries Page ___________ """
 # Route for displaying Food Entries
 @app.route("/foodentries", methods=["GET"])
 def foodentries():
@@ -860,7 +871,7 @@ def fetchFoodNames():
     cur.execute(query)
     return cur.fetchall()
 
-""" -------- Routes for Exercise Entries -------- """
+""" ___________ Routes for Exercise Entries Page ___________ """
 # Route for Reading and Creating Exercise Entries
 @app.route("/exerciseentries", methods=["GET", "POST"])
 def exerciseentries():
@@ -1068,9 +1079,10 @@ def fetchClientNamesExerciseEntries():
 Citation for the following code:
 Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
-Adapted from https://github.com/osu-cs340-ecampus/flask-starter-app with significant modifications
+Copied from https://github.com/osu-cs340-ecampus/flask-starter-app with minor modifications
 """
-""" Listener to host the website """
+
+""" ___________ Listener for Website Hosting ___________ """
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 15834))
     app.run(port=port, debug=True)

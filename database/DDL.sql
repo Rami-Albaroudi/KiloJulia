@@ -1,19 +1,26 @@
--- Citation for below 2 and last 2 lines:
--- Date: 23/05/2024
--- Authors: OSU Staff
--- Copied from CS340 official course materials - Project Step 2 Draft page
--- URL: https://canvas.oregonstate.edu/courses/1958399/assignments/9589656?module_item_id=24181840
+/*
+Citation for below code:
+Date: 06/06/2024
+Authors: OSU Staff
+Copied from CS340 official course materials - Project Step 2 Draft page
+URL: https://canvas.oregonstate.edu/courses/1958399/assignments/9589656?module_item_id=24181840
+*/
 
 -- Disable foreign key checks and autocommit to import the file
 SET FOREIGN_KEY_CHECKS=0;
 SET AUTOCOMMIT = 0;
 
--- Citation for below SCHEMA, TABLE, and INSERT statements:
--- Date: 01/05/2024
--- Authors: Rami Albaroudi, Mohamed Saud, Group 13
--- Schema, Tables, Attributes, Keys, and Constraints were generated using MySQL Forward Engineering from our fully original MySQL Workbench schema. 
--- ON DELETE/UPDATE CASCADE statements were manually added to the CREATE TABLE statements. 
--- INSERT statements and sample data are fully original, manually created work. 
+/*
+Citation for below CREATE TABLE, and INSERT statements:
+Date: 06/06/2024
+Authors: Rami Albaroudi, Mohamed Saud, Group 13
+Schema, Tables, Attributes, Keys, and Constraints were generated 
+using MySQL Forward Engineering from our fully original MySQL Workbench schema and manually modified.
+ON DELETE/UPDATE CASCADE statements were manually added to the CREATE TABLE statements. 
+INSERT statements and sample data are fully original, manually created work. 
+*/
+
+/*_________ Create Statements for Database Tables _________*/
 
 -- Create Table `Staff`
 DROP TABLE IF EXISTS `Staff` ;
@@ -136,7 +143,8 @@ CREATE TABLE IF NOT EXISTS `ExerciseEntries` (
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
--- Insert Statements for Sample Data
+/*_________ Insert Statements for Sample Data _________*/
+
 -- Insert Staff
 INSERT INTO Staff (staffID, staffName, staffEmail, staffCapacity, staffNote) VALUES
 (1, 'John Adams', 'john.adams@nutriclinic.com', 'Not Available', 'Vegan Diets Specialist'),
@@ -189,6 +197,14 @@ INSERT INTO ExerciseEntries (exerciseEntryID, trackedDayID, exerciseEntryName, e
 (2, 1, 'Heavy Weightlifting', 'Strength', 400, 'Squats, Benchpress'),
 (3, 2, 'Rock Climbing', 'Other', 200, 'At a gym'),
 (4, 2, 'Light Yoga', 'Stretching', 100, NULL);
+
+/*
+Citation for below code:
+Date: 06/06/2024
+Authors: OSU Staff
+Copied from CS340 official course materials - Project Step 2 Draft page
+URL: https://canvas.oregonstate.edu/courses/1958399/assignments/9589656?module_item_id=24181840
+*/
 
 -- Re-enable foreign key checks and commit file
 SET FOREIGN_KEY_CHECKS=1;
