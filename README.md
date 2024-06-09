@@ -8,3 +8,14 @@ Most nutrition apps only track data for a single client at a time. In contrast, 
 4.	TrackedDays
 5.	ExerciseEntries
 6.	FoodEntries
+
+Required dependencies/packages are listed in the requirements.txt file. Use " pip install -r requirements.txt " to install. 
+
+Citations:
+1. https://github.com/osu-cs340-ecampus/flask-starter-app
+2. https://canvas.oregonstate.edu/courses/1958399/assignments/9589656?module_item_id=24181840
+3. https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api
+4. https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript
+5. https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+6. https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/
+7. https://github.com/twitter/twemoji/blob/master/assets/svg/1f955.svg

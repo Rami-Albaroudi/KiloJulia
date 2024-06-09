@@ -1,5 +1,5 @@
 /* 
-Citation for below queries:
+Citation for below code:
 Date: 06/06/2024 
 Authors: Rami Albaroudi, Mohamed Saud, Group 13
 Original, hand-authored work 

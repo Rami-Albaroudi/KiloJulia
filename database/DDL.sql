@@ -11,7 +11,7 @@ SET FOREIGN_KEY_CHECKS=0;
 SET AUTOCOMMIT = 0;
 
 /*
-Citation for below CREATE TABLE, and INSERT statements:
+Citation for below code:
 Date: 06/06/2024
 Authors: Rami Albaroudi, Mohamed Saud, Group 13
 Schema, Tables, Attributes, Keys, and Constraints were generated 

@@ -41,7 +41,6 @@ def index():
     # We use Jinja/Flask templates to build the foundation for our pages
     return render_template("index.j2")
 
-
 """ ___________ Routes for Staff Page ___________ """
 # Route for Reading and Updating Staff Records
 @app.route("/staff", methods=["GET", "POST"])
@@ -357,7 +356,6 @@ def deleteClientRecord(clientID):
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM Clients WHERE clientID = %s;", (clientID,))
     mysql.connection.commit()
-
 
 """ ___________ Routes for Staff-Client Assignments Page ___________ """
 # Route for Reading and Updating Staff-Client Assignments
@@ -775,7 +773,7 @@ def addfoodentry():
     if not trackedDayID:
         return "Tracked day not found for the given date and client name.", 400
     # Fetch the food ID if there is one, otherwise set it to NULL (Foods are Nullable in Food Entries)
-    foodID = fetchFoods(foodName)
+    foodID = fetchFoodsFoodEntries(foodName)
     if not foodID:
         foodID = None
     cur = mysql.connection.cursor()
@@ -850,7 +848,7 @@ def getTrackedDayFoodEntries(trackedDayDate, clientName):
     return result["trackedDayID"] if result else None
 
 # Route to get the food ID using the food name
-def fetchFoods(foodName):
+def fetchFoodsFoodEntries(foodName):
     query = "SELECT foodID FROM Foods WHERE foodName = %s;"
     cur = mysql.connection.cursor()
     cur.execute(query, (foodName,))
