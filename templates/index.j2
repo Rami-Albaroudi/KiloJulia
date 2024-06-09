@@ -1,6 +1,6 @@
 <!--
 Citation for the following code:
-Date: 09/05/2024
+Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
 Original work with some Jinja expressions adapted from https://github.com/osu-cs340-ecampus/flask-starter-app?tab=readme-ov-file#dynamically-displaying-data-in-a-template
 -->
@@ -20,24 +20,19 @@ Original work with some Jinja expressions adapted from https://github.com/osu-cs
     <tr>
         <td style="text-align: center;">
             <div style="display: inline-block; text-align: left;">
-                <ul style="padding: 0; list-style-type: disc;">
-                    <li><b><a href="/staff">Staff:</a></b> Manage the clinic's staff and their availability.</li>
-                    <li><b><a href="/clients">Clients:</a></b> Manage the clinic's clients and their biometric data.
-                    </li>
-                    <li><b><a href="/staffclients">Staff-Client Assignments:</a></b> Assign staff members to clients and
-                        manage their assignments.</li>
-                    <li><b><a href="/foods">Foods:</a></b> Manage the foods database that is used to create food
-                        entries.</li>
-                    <li><b><a href="/trackeddays">Tracked Days:</a></b> Track days for different clients to get calorie
-                        counts.</li>
-                    <li><b><a href="/foodentries">Food Entries:</a></b> Enter a client's meal on a particular tracked
-                        day.</li>
-                    <li><b><a href="/exerciseentries">Exercise Entries:</a></b> Enter a client's exercise on a
-                        particular tracked day.</li>
+                <ul style="padding: 0; list-style-type: disc; line-height: 2;">
+                    <li><a href="/staff"><b>Staff:</b> Manage the clinic's staff and their availability.</a></li>
+                    <li><a href="/clients"><b>Clients:</b> Manage the clinic's clients and their biometric data.</a></li>
+                    <li><a href="/staffclients"><b>Staff-Client Assignments:</b> Assign staff members to clients and manage their assignments.</a></li>
+                    <li><a href="/foods"><b>Foods:</b> Manage the foods database that is used to create food entries.</a></li>
+                    <li><a href="/trackeddays"><b>Tracked Days:</b> Track days for different clients to get calorie counts.</a></li>
+                    <li><a href="/foodentries"><b>Food Entries:</b> Enter a client's meal on a particular tracked day.</a></li>
+                    <li><a href="/exerciseentries"><b>Exercise Entries:</b> Enter a client's exercise on a particular tracked day.</a></li>
                 </ul>
             </div>
         </td>
     </tr>
 </table>
+
 
 {% endblock %}

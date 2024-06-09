@@ -1,6 +1,6 @@
 """
 Citation for the following code:
-Date: 29/05/2024
+Date: 06/06/2024
 Authors: Rami Albaroudi and Mohamed Saud, Group 13
 Adapted from https://github.com/osu-cs340-ecampus/flask-starter-app with significant modifications
 """
@@ -11,7 +11,6 @@ from flask_mysqldb import MySQL
 from MySQLdb import IntegrityError
 import os
 import database.db_connector as db
-from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
 
 # Configure connection to the database
@@ -391,7 +390,7 @@ def staffclients():
         "staffclients.j2",
         staffclients=fetchStaffClients(),
         staff=fetchStaff(),
-        clients=fetchClients(),
+        clients=fetchClientsAssignments(),
     )
 
 
@@ -440,7 +439,7 @@ def fetchStaff():
 
 
 # Helper function to READ Client Records
-def fetchClients():
+def fetchClientsAssignments():
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM Clients;")
     return cur.fetchall()
@@ -495,68 +494,167 @@ def deleteStaffClientRecord(staffID, clientID):
 """ -------- Routes for Tracked Days -------- """
 
 
-# TODO: Implement CUD
+# Route for Reading and Creating Tracked Days
 @app.route("/trackeddays", methods=["GET", "POST"])
 def trackeddays():
     if request.method == "POST":
-        search_query = request.form["search_query"]
-        query = """
-        SELECT 
-            td.trackedDayID,
-            td.clientID,
-            td.trackedDayDate,
-            (
-                SELECT COALESCE(SUM(fe.foodEntryCalories), 0)
-                FROM FoodEntries fe
-                WHERE fe.trackedDayID = td.trackedDayID
-            ) -
-            (
-                SELECT COALESCE(SUM(ee.exerciseEntryCalories), 0)
-                FROM ExerciseEntries ee
-                WHERE ee.trackedDayID = td.trackedDayID
-            ) AS trackedDayTotalCalories,
-            td.trackedDayCalorieTarget,
-            td.trackedDayNote,
-            c.clientName
-        FROM TrackedDays td
-        JOIN Clients c ON td.clientID = c.clientID
-        WHERE c.clientName LIKE %s;
-        """
-        cur = mysql.connection.cursor()
-        cur.execute(query, ("%" + search_query + "%",))
-        trackeddays = cur.fetchall()
+        clientID = request.form.get("clientID")
+        trackedDayDate = request.form.get("trackedDayDate")
+        trackedDayCalorieTarget = request.form.get("trackedDayCalorieTarget")
+        trackedDayNote = request.form.get("trackedDayNote")
+
+        # Validate the form inputs
+        errors = validateTrackedDayForm(
+            clientID, trackedDayDate, trackedDayCalorieTarget
+        )
+        if not errors:
+            try:
+                insertTrackedDay(
+                    clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote
+                )
+                return redirect("/trackeddays")
+            except IntegrityError:
+                return "Error inserting tracked day.", 400
+        return render_template(
+            "trackeddays.j2",
+            trackeddays=fetchTrackedDays(),
+            clients=fetchClientsDays(),
+            errors=errors,
+        )
     else:
+        return render_template(
+            "trackeddays.j2", trackeddays=fetchTrackedDays(), clients=fetchClientsDays()
+        )
+
+
+# Route for Updating Tracked Days
+@app.route("/updatetrackedday/<int:trackedDayID>", methods=["POST"])
+def updateTrackedDay(trackedDayID):
+    clientID = request.form.get("clientID")
+    trackedDayDate = request.form.get("trackedDayDate")
+    trackedDayCalorieTarget = request.form.get("trackedDayCalorieTarget")
+    trackedDayNote = request.form.get("trackedDayNote")
+
+    # Validate the form inputs
+    errors = validateTrackedDayForm(clientID, trackedDayDate, trackedDayCalorieTarget)
+    if not errors:
+        try:
+            updateTrackedDayRecord(
+                trackedDayID,
+                clientID,
+                trackedDayDate,
+                trackedDayCalorieTarget,
+                trackedDayNote,
+            )
+            return "OK"
+        except IntegrityError:
+            return "Error updating tracked day.", 400
+    return ", ".join(errors), 400
+
+
+# Route for Deleting Tracked Days
+@app.route("/deletetrackedday/<int:trackedDayID>", methods=["POST"])
+def deleteTrackedDay(trackedDayID):
+    deleteTrackedDayRecord(trackedDayID)
+    return redirect("/trackeddays")
+
+
+# Helper function for validation for the Tracked Day Form
+def validateTrackedDayForm(clientID, trackedDayDate, trackedDayCalorieTarget):
+    errors = []
+    if not clientID:
+        errors.append("Client ID is required.")
+    if not trackedDayDate:
+        errors.append("Date is required.")
+    if not trackedDayCalorieTarget:
+        errors.append("Calorie target is required.")
+    elif int(trackedDayCalorieTarget) < 1:
+        errors.append("Calorie target must be at least 1.")
+    return errors
+
+
+# Helper function to CREATE a Tracked Day Record
+def insertTrackedDay(clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote):
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute(
+            "INSERT INTO TrackedDays (clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote) VALUES (%s, %s, %s, %s);",
+            (clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote),
+        )
+        mysql.connection.commit()
+    except IntegrityError as e:
+        mysql.connection.rollback()
+        raise e
+
+
+# Helper function to UPDATE a Tracked Day Record
+def updateTrackedDayRecord(
+    trackedDayID, clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote
+):
+    cur = mysql.connection.cursor()
+    try:
         query = """
-        SELECT 
-            td.trackedDayID,
-            td.clientID,
-            td.trackedDayDate,
-            (
-                SELECT COALESCE(SUM(fe.foodEntryCalories), 0)
-                FROM FoodEntries fe
-                WHERE fe.trackedDayID = td.trackedDayID
-            ) -
-            (
-                SELECT COALESCE(SUM(ee.exerciseEntryCalories), 0)
-                FROM ExerciseEntries ee
-                WHERE ee.trackedDayID = td.trackedDayID
-            ) AS trackedDayTotalCalories,
-            td.trackedDayCalorieTarget,
-            td.trackedDayNote,
-            c.clientName
-        FROM TrackedDays td
-        JOIN Clients c ON td.clientID = c.clientID;
+        UPDATE TrackedDays 
+        SET clientID = %s, trackedDayDate = %s, trackedDayCalorieTarget = %s, trackedDayNote = %s 
+        WHERE trackedDayID = %s;
         """
-        cur = mysql.connection.cursor()
-        cur.execute(query)
-        trackeddays = cur.fetchall()
+        cur.execute(
+            query,
+            (
+                clientID,
+                trackedDayDate,
+                trackedDayCalorieTarget,
+                trackedDayNote,
+                trackedDayID,
+            ),
+        )
+        mysql.connection.commit()
+    except IntegrityError as e:
+        mysql.connection.rollback()
+        print(f"IntegrityError: {e}")
+        raise e
 
-    # Get all client names for autocomplete
-    query = "SELECT clientName FROM Clients;"
+
+# Helper function to DELETE a Tracked Day Record
+def deleteTrackedDayRecord(trackedDayID):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM TrackedDays WHERE trackedDayID = %s;", (trackedDayID,))
+    mysql.connection.commit()
+
+
+# Helper function to READ the Tracked Days Records
+def fetchTrackedDays():
+    cur = mysql.connection.cursor()
+    query = """
+    SELECT 
+        td.trackedDayID,
+        td.clientID,
+        td.trackedDayDate,
+        (
+            SELECT COALESCE(SUM(fe.foodEntryCalories), 0)
+            FROM FoodEntries fe
+            WHERE fe.trackedDayID = td.trackedDayID
+        ) -
+        (
+            SELECT COALESCE(SUM(ee.exerciseEntryCalories), 0)
+            FROM ExerciseEntries ee
+            WHERE ee.trackedDayID = td.trackedDayID
+        ) AS trackedDayTotalCalories,
+        td.trackedDayCalorieTarget,
+        td.trackedDayNote,
+        c.clientName
+    FROM TrackedDays td
+    JOIN Clients c ON td.clientID = c.clientID;
+    """
     cur.execute(query)
-    clients = cur.fetchall()
+    return cur.fetchall()
 
-    return render_template("trackeddays.j2", trackeddays=trackeddays, clients=clients)
+
+# Helper function to READ the Clients Records
+def fetchClientsDays():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT clientID, clientName FROM Clients;")
+    return cur.fetchall()
 
 
 """ -------- Routes for Foods -------- """
@@ -695,9 +793,88 @@ def foodentries():
 """ -------- Routes for Exercise Entries -------- """
 
 
-# TODO: Implement CUD
-@app.route("/exerciseentries")
+# Route for Reading and Creating Exercise Entries
+@app.route("/exerciseentries", methods=["GET", "POST"])
 def exerciseentries():
+    if request.method == "POST":
+        trackedDayID = request.form["trackedDayID"]
+        exerciseEntryName = request.form["exerciseEntryName"]
+        exerciseEntryType = request.form["exerciseEntryType"]
+        exerciseEntryCalories = request.form["exerciseEntryCalories"]
+        exerciseEntryNote = request.form["exerciseEntryNote"]
+
+        # Validate the form data
+        errors = validateExerciseEntryForm(
+            exerciseEntryName, exerciseEntryType, exerciseEntryCalories
+        )
+        if not errors:
+            try:
+                insertExerciseEntry(
+                    trackedDayID,
+                    exerciseEntryName,
+                    exerciseEntryType,
+                    exerciseEntryCalories,
+                    exerciseEntryNote,
+                )
+                return redirect("/exerciseentries")
+            except IntegrityError:
+                return "An error occurred while adding the exercise entry.", 400
+        return render_template(
+            "exerciseentries.j2", exerciseentries=fetchExerciseEntries(), errors=errors
+        )
+    return render_template("exerciseentries.j2", exerciseentries=fetchExerciseEntries())
+
+
+# Route for Updating Exercise Entries
+@app.route("/updateexerciseentry/<int:exerciseEntryID>", methods=["POST"])
+def updateExerciseEntry(exerciseEntryID):
+    exerciseEntryName = request.form["exerciseEntryName"]
+    exerciseEntryType = request.form["exerciseEntryType"]
+    exerciseEntryCalories = request.form["exerciseEntryCalories"]
+    exerciseEntryNote = request.form["exerciseEntryNote"]
+
+    # Validate the form data
+    errors = validateExerciseEntryForm(
+        exerciseEntryName, exerciseEntryType, exerciseEntryCalories
+    )
+    if not errors:
+        try:
+            updateExerciseEntryRecord(
+                exerciseEntryID,
+                exerciseEntryName,
+                exerciseEntryType,
+                exerciseEntryCalories,
+                exerciseEntryNote,
+            )
+            return "OK"
+        except IntegrityError:
+            errors.append("An error occurred while updating the exercise entry.")
+    return ", ".join(errors), 400
+
+
+# Route for Deleting Exercise Entries
+@app.route("/deleteexerciseentry/<int:exerciseEntryID>", methods=["POST"])
+def deleteExerciseEntry(exerciseEntryID):
+    deleteExerciseEntryRecord(exerciseEntryID)
+    return redirect("/exerciseentries")
+
+
+# Helper function for validation for the Exercise Entry Form
+def validateExerciseEntryForm(
+    exerciseEntryName, exerciseEntryType, exerciseEntryCalories
+):
+    errors = []
+    if not exerciseEntryName:
+        errors.append("Exercise name is required.")
+    if not exerciseEntryType:
+        errors.append("Exercise type is required.")
+    if not exerciseEntryCalories or int(exerciseEntryCalories) <= 0:
+        errors.append("Calories must be a positive number.")
+    return errors
+
+
+# Helper function to READ the Exercise Entries
+def fetchExerciseEntries():
     query = """
     SELECT 
         ExerciseEntries.exerciseEntryID, 
@@ -716,11 +893,89 @@ def exerciseentries():
     """
     cur = mysql.connection.cursor()
     cur.execute(query)
-    exerciseentries = cur.fetchall()
-    return render_template("exerciseentries.j2", exerciseentries=exerciseentries)
+    return cur.fetchall()
+
+
+# Helper function to CREATE an Exercise Entry
+def insertExerciseEntry(
+    trackedDayID,
+    exerciseEntryName,
+    exerciseEntryType,
+    exerciseEntryCalories,
+    exerciseEntryNote,
+):
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute(
+            "INSERT INTO ExerciseEntries (trackedDayID, exerciseEntryName, exerciseEntryType, exerciseEntryCalories, exerciseEntryNote) VALUES (%s, %s, %s, %s, %s);",
+            (
+                trackedDayID,
+                exerciseEntryName,
+                exerciseEntryType,
+                exerciseEntryCalories,
+                exerciseEntryNote,
+            ),
+        )
+        mysql.connection.commit()
+    except IntegrityError as e:
+        mysql.connection.rollback()
+        raise e
+
+
+# Helper function to UPDATE an Exercise Entry
+def updateExerciseEntryRecord(
+    exerciseEntryID,
+    exerciseEntryName,
+    exerciseEntryType,
+    exerciseEntryCalories,
+    exerciseEntryNote,
+):
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute(
+            "UPDATE ExerciseEntries SET exerciseEntryName = %s, exerciseEntryType = %s, exerciseEntryCalories = %s, exerciseEntryNote = %s WHERE exerciseEntryID = %s;",
+            (
+                exerciseEntryName,
+                exerciseEntryType,
+                exerciseEntryCalories,
+                exerciseEntryNote,
+                exerciseEntryID,
+            ),
+        )
+        mysql.connection.commit()
+    except IntegrityError as e:
+        mysql.connection.rollback()
+        raise e
+
+
+# Helper function to DELETE an Exercise Entry
+def deleteExerciseEntryRecord(exerciseEntryID):
+    cur = mysql.connection.cursor()
+    cur.execute(
+        "DELETE FROM ExerciseEntries WHERE exerciseEntryID = %s;", (exerciseEntryID,)
+    )
+    mysql.connection.commit()
+
+
+# Helper function to fetch client names and tracked day dates
+def fetchClientNamesAndTrackedDays():
+    query = """
+    SELECT 
+        Clients.clientID, 
+        Clients.clientName, 
+        TrackedDays.trackedDayID, 
+        TrackedDays.trackedDayDate
+    FROM 
+        Clients
+    JOIN 
+        TrackedDays ON Clients.clientID = TrackedDays.clientID;
+    """
+    cur = mysql.connection.cursor()
+    cur.execute(query)
+    return cur.fetchall()
 
 
 # Listener
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 15834))
+    port = int(os.environ.get("PORT", 15835))
     app.run(port=port, debug=True)
