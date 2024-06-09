@@ -9,7 +9,11 @@ Most nutrition apps only track data for a single client at a time. In contrast, 
 5.	ExerciseEntries
 6.	FoodEntries
 
-Required dependencies/packages are listed in the requirements.txt file. Use " pip install -r requirements.txt " to install. 
+Required dependencies/packages are listed in the requirements.txt file. Use " pip install -r requirements.txt " to install.
+
+Known Issues:
+1. Clicking a button more than once may cause an error message to display even if the operation was successful.
+2. Clicking buttons too rapidly may cause an error message to display even if the operation was successful.
 
 Citations:
 1. https://github.com/osu-cs340-ecampus/flask-starter-app
