@@ -160,20 +160,22 @@ INSERT INTO Clients (clientID, clientName, clientEmail, clientSex, clientAge, cl
 (4, 'Akash Ashwal', 'akashhasw@mailme.com', 'Male', 38, 175.0, 92.0, 'High', 1850, NULL);
 
 -- Insert StaffClients
-INSERT INTO StaffClients (clientID, staffID) VALUES
-(1, 1),
-(1, 2),
-(2, 1),
-(3, 2),
-(4, 3),
-(4, 4);
+INSERT INTO StaffClients (clientID, staffID)
+VALUES
+((SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali'), (SELECT staffID FROM Staff WHERE staffName = 'John Adams')),
+((SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali'), (SELECT staffID FROM Staff WHERE staffName = 'Charlene Yu')),
+((SELECT clientID FROM Clients WHERE clientName = 'Jessica Jackson'), (SELECT staffID FROM Staff WHERE staffName = 'John Adams')),
+((SELECT clientID FROM Clients WHERE clientName = 'Maria Filipe'), (SELECT staffID FROM Staff WHERE staffName = 'Charlene Yu')),
+((SELECT clientID FROM Clients WHERE clientName = 'Akash Ashwal'), (SELECT staffID FROM Staff WHERE staffName = 'Susan Oyowe')),
+((SELECT clientID FROM Clients WHERE clientName = 'Akash Ashwal'), (SELECT staffID FROM Staff WHERE staffName = 'Mohrami Alsaud'));
 
 -- Insert TrackedDays
-INSERT INTO TrackedDays (trackedDayID, clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote) VALUES
-(1, 1, '2024-04-20', 2900, 'Client''s first day'),
-(2, 2, '2024-04-20', 1700, NULL),
-(3, 1, '2024-04-21', 2900, 'Bulking season'),
-(4, 2, '2024-04-21', 1700, 'Not Reported');
+INSERT INTO TrackedDays (trackedDayID, clientID, trackedDayDate, trackedDayCalorieTarget, trackedDayNote)
+VALUES
+(1, (SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali'), '2024-04-20', 2900, 'Client''s first day'),
+(2, (SELECT clientID FROM Clients WHERE clientName = 'Jessica Jackson'), '2024-04-20', 1700, NULL),
+(3, (SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali'), '2024-04-21', 2900, 'Bulking season'),
+(4, (SELECT clientID FROM Clients WHERE clientName = 'Jessica Jackson'), '2024-04-21', 1700, 'Not Reported');
 
 -- Insert Foods
 INSERT INTO Foods (foodID, foodName, foodType, foodCaloriesPerGram, foodNote) VALUES
@@ -183,20 +185,22 @@ INSERT INTO Foods (foodID, foodName, foodType, foodCaloriesPerGram, foodNote) VA
 (4, 'Cheeseburger, Restaurant, Fried', 'Fast Foods', 3.39, 'Average for restaurants');
 
 -- Insert FoodEntries
-INSERT INTO FoodEntries (foodEntryID, trackedDayID, foodID, foodEntryCalories, foodEntryGramWeight, foodEntryNote) VALUES
-(1, 1, 1, 89, 100, NULL),
-(2, 1, 2, 230, 100, NULL),
-(3, 1, 4, 1695, 500, 'Wendy''s Burger'),
-(4, 2, 2, 690, 300, 'Store-Bought'),
-(5, 2, 4, 1017, 300, 'Small Burger'),
-(6, 3, NULL, 250, 86, 'Calories from Chocolate Wrapper');
+INSERT INTO FoodEntries (foodEntryID, trackedDayID, foodID, foodEntryCalories, foodEntryGramWeight, foodEntryNote)
+VALUES
+(1, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali') AND trackedDayDate = '2024-04-20'), (SELECT foodID FROM Foods WHERE foodName = 'Medium Banana'), 89, 100, NULL),
+(2, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali') AND trackedDayDate = '2024-04-20'), (SELECT foodID FROM Foods WHERE foodName = 'Croissant, Medium, Store-Bought'), 230, 100, NULL),
+(3, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali') AND trackedDayDate = '2024-04-20'), (SELECT foodID FROM Foods WHERE foodName = 'Cheeseburger, Restaurant, Fried'), 1695, 500, 'Wendy''s Burger'),
+(4, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Jessica Jackson') AND trackedDayDate = '2024-04-20'), (SELECT foodID FROM Foods WHERE foodName = 'Croissant, Medium, Store-Bought'), 690, 300, 'Store-Bought'),
+(5, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Jessica Jackson') AND trackedDayDate = '2024-04-20'), (SELECT foodID FROM Foods WHERE foodName = 'Cheeseburger, Restaurant, Fried'), 1017, 300, 'Small Burger'),
+(6, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali') AND trackedDayDate = '2024-04-21'), NULL, 250, 86, 'Calories from Chocolate Wrapper');
 
 -- Insert ExerciseEntries
-INSERT INTO ExerciseEntries (exerciseEntryID, trackedDayID, exerciseEntryName, exerciseEntryType, exerciseEntryCalories, exerciseEntryNote) VALUES
-(1, 1, 'Light Jogging', 'Cardio', 250, NULL),
-(2, 1, 'Heavy Weightlifting', 'Strength', 400, 'Squats, Benchpress'),
-(3, 2, 'Rock Climbing', 'Other', 200, 'At a gym'),
-(4, 2, 'Light Yoga', 'Stretching', 100, NULL);
+INSERT INTO ExerciseEntries (exerciseEntryID, trackedDayID, exerciseEntryName, exerciseEntryType, exerciseEntryCalories, exerciseEntryNote)
+VALUES
+(1, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali') AND trackedDayDate = '2024-04-20'), 'Light Jogging', 'Cardio', 250, NULL),
+(2, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Muhammad Ali') AND trackedDayDate = '2024-04-20'), 'Heavy Weightlifting', 'Strength', 400, 'Squats, Benchpress'),
+(3, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Jessica Jackson') AND trackedDayDate = '2024-04-20'), 'Rock Climbing', 'Other', 200, 'At a gym'),
+(4, (SELECT trackedDayID FROM TrackedDays WHERE clientID = (SELECT clientID FROM Clients WHERE clientName = 'Jessica Jackson') AND trackedDayDate = '2024-04-20'), 'Light Yoga', 'Stretching', 100, NULL);
 
 /*
 Citation for below code:
