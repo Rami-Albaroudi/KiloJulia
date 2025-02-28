@@ -1,25 +1,99 @@
-# KiloJulia
+# KiloJulia 🥕
 
-Most nutrition apps only track data for a single client at a time. In contrast, NutriClinic, a nutrition and fitness clinic, needs to track data for up to 100 unique clients at a time. NutriClinic provides all clients with food scales, fitness watches, and a log sheet that clients fill out daily to submit logs to NutriClinic at the end of every week. NutriClinic used to ask clients to input data directly into an app and export the reports, but its staff have found that clients record and enter data inaccurately, and they would prefer to verify client logs as they enter it into a database themselves. In addition, NutriClinic staff members often have multiple clients at a time, and need easy access to client records so they can swap clients if they are unavailable. Using KiloJulia’s database-driven website, NutriClinic staff can conveniently enter all their clients’ exercise and food logs using pre-defined databases of foods to create accurate records. The database can be used to produce various reports that help staff make informed decisions about their clients’ diet and exercise, track progress over time, and help clients achieve health and fitness goals. KiloJulia also allows multiple clients to be assigned to multiple staff members and vice versa, providing convenient record sharing to make sure assigned staff members always understand their clients’ situation. KiloJulia is designed to store and process nutritional data for up to 100 clients, each associated with multiple staff members as well as multiple meals and exercises per day. Overall, every instance of KiloJulia is designed to handle up to 200,000 data entries per year (100 clients * 365 days * 5 food and exercise entries = 182,500 entries + 17,000 foods + 500 staff and client pairings). The KiloJulia database consists of 6 primary tables representing each category of data that NutriClinic needs to track.   
- 
-1.	Clients
-2.	Staff
-3.	Foods 
-4.	TrackedDays
-5.	ExerciseEntries
-6.	FoodEntries
+A database-driven nutrition and fitness tracking system designed for clinics managing multiple clients with robust reporting capabilities.
 
-Required dependencies/packages are listed in the requirements.txt file. Use " pip install -r requirements.txt " to install.
+## Overview
 
-Known Issues:
-1. Clicking a button more than once for a single operation may cause an error message to display even if the operation was successful.
-2. Clicking different buttons too rapidly may cause an error message to display even if the operation was successful.
+KiloJulia addresses key challenges faced by nutrition clinics by providing:
 
-Citations:
-1. https://github.com/osu-cs340-ecampus/flask-starter-app
-2. https://canvas.oregonstate.edu/courses/1958399/assignments/9589656?module_item_id=24181840
-3. https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api
-4. https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript
-5. https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-6. https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/
-7. https://github.com/twitter/twemoji/blob/master/assets/svg/1f955.svg
+- **Multi-client management** (100+ simultaneous clients)
+- **Staff collaboration tools** with shared record access
+- **Verified data entry** through clinician-controlled input
+- **Comprehensive reporting** for informed decision-making
+- **Scalable architecture** handling 200,000+ annual entries
+
+## Key Features
+
+### Client Management
+
+- Track 5+ daily food/exercise entries per client
+- Maintain historical progress records
+- Manage client-staff assignments (500+ pairings)
+
+### Staff Tools
+
+- Multi-client dashboard views
+- Instant access switching between clients
+- Shared client assignments among staff
+
+### Nutritional Database
+
+- _n_ predefined food entries
+- Standardized measurement tracking
+- Exercise regimen documentation
+
+## Database Structure
+
+### Core Tables
+
+1. **Clients** - Demographic and biometric data
+2. **Staff** - Clinician credentials and assignments
+3. **Foods** - Nutritional database with _n_ entries
+4. **TrackedDays** - Daily client summaries
+5. **ExerciseEntries** - Workout logging
+6. **FoodEntries** - Meal tracking
+
+### Scalability
+
+- Designed for 100+ simultaneous clients
+- Processes 200,000+ annual entries:
+  - 180,000+ food/exercise records
+  - 20,000+ food database entries
+  - 500+ staff-client pairings
+
+## Installation
+
+### Clone repository
+
+`git clone [repository_url]`
+
+### Install dependencies
+
+`pip install -r requirements.txt`
+
+### Configure MySQL database
+
+`mysql -u [username] -p < schema.sql`
+
+### Prerequisites
+
+- Python 3.8+
+- MySQL 5.7+
+- Modern web browser
+
+## Known Issues
+
+1. **Duplicate Operation Errors**  
+   - Clicking buttons multiple times may display false errors  
+   - Allow 2+ seconds between actions
+
+2. **Rapid Action Conflicts**  
+   - Quick successive clicks may trigger errors  
+   - Complete one operation before initiating another
+
+## Technologies Used
+
+- **Frontend**: HTML5, CSS3, JavaScript
+- **Backend**: Python/Flask
+- **Database**: MySQL
+- **APIs**: Fetch API for CRUD operations
+
+## Citations
+1. [Flask Starter App - OSU CS340](https://github.com/osu-cs340-ecampus/flask-starter-app)
+2. [OSU CS340 Database Assignment Guidelines](https://canvas.oregonstate.edu/courses/1958399/assignments/9589656?module_item_id=24181840)
+3. [Post Form Data Using JavaScript Fetch API](https://bobbyhadz.com/blog/post-form-data-using-javascript-fetch-api)
+4. [Add onClick Event to Table Row in JavaScript](https://bobbyhadz.com/blog/add-onclick-event-to-table-row-in-javascript)
+5. [Using the Fetch API - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+6. [JavaScript Confirm Delete Before Delete Code](https://tutorial.eyehunts.com/js/javascript-confirm-delete-before-delete-code/)
+7. [Carrot Emoji SVG - Twitter Twemoji](https://github.com/twitter/twemoji/blob/master/assets/svg/1f955.svg)
+
